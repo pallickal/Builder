@@ -1,0 +1,125 @@
+<html ng-app="osApp">
+  <head>
+    <meta charset="utf-8">
+    <title>Openstack Web App</title>
+    <!-- Switch these to minified versions for production -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-cookies.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-route.js"></script>
+    <script>
+      var osApp = angular.module('osApp', ['ngCookies', 'ngRoute']);
+
+      osApp.config(function($routeProvider) {
+        $routeProvider.
+          when('/',{
+            templateUrl: 'login.html',
+            <!-- need conditional - logged in ? redirect to /servers -->
+            controller: 'loginCtrl'
+          }).
+          when('/tenants',{
+            templateUrl: 'tenants.html',
+            controller: 'tenantsCtrl'
+          }).
+          when('/servers',{
+            templateUrl: 'servers.html',
+            controller: 'serversCtrl'
+          }).
+          otherwise({
+            redirectTo: '/'
+          });
+      });
+
+      osApp.run(function($http) {
+      });
+
+      osApp.factory('session', function($http, $cookies) {
+        function authenticate(userName, password, callback){
+          var requestData = {
+                            "auth": {
+                              "identity": {
+                                "methods": [
+                                  "password"
+                                ],
+                                "password": {
+                                  "user": {
+                                    "domain": {
+                                      "name": "default"
+                                    },
+                                    "name": userName,
+                                    "password": password
+                                  }
+                                }
+                              }
+                            }
+                          };
+
+          console.log(JSON.stringify(requestData, null, '  '));
+
+          $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
+            .success(function(data, status, headers){
+              console.log('Token response header:\n' + JSON.stringify(headers(), null, '  '));
+              console.log('Token response data:\n' + JSON.stringify(data, null, '  '));
+
+              $http.defaults.headers.common['X-Auth-Token'] = headers('X-Subject-Token');
+
+              $cookies.put('X-Subject-Token', headers('X-Subject-Token'));
+              console.log('|X-Subject-Token| = ' + $cookies.get('X-Subject-Token'));
+
+              $cookies.put('X-Subject-Token-Expires', data.token.expires_at);
+              console.log('|X-Subject-Token-Expires| = ' + $cookies.get('X-Subject-Token-Expires'));
+
+              $cookies.put('user_id', data.token.user.id);
+              console.log('|user_id| = ' + $cookies.get('user_id'));
+
+              $cookies.putObject('user', {
+                "user_id": data.token.user.id,
+                "X-Auth-Token": headers('X-Subject-Token')
+                <!-- Add token expiration date/time -->
+              });
+              console.log('|user| = ' + JSON.stringify($cookies.getObject('user'), null,' '));
+              callback();
+            }); <!-- add failure handling -->
+        };
+
+        return {
+          authenticate: authenticate
+        };
+      });
+
+      osApp.controller('loginCtrl', function($scope, $http, $cookies, $window, session){
+        $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
+
+        console.log('cookie: ' + $cookies.get('X-Auth-Token'));
+
+        $scope.processFunction = function() {
+          session.authenticate($scope.formData.userName, $scope.formData.password, function() {
+            $window.location.href = '#/tenants';
+          });
+        };
+      });
+
+      osApp.controller('tenantsCtrl', function($scope, $http, $cookies){
+        $scope.tenants = [];
+        $scope.sortField = 'name';
+        $scope.reverse = false;
+
+        console.log('common $http headers in tenantsCtrl: \n', $http.defaults.headers.common)
+
+        $http.get('http://192.168.122.183:5000/v2.0/tenants')
+        .success(function(data){
+          console.log('Test response data:\n' + JSON.stringify(data, null, '  '));
+          $scope.tenants = data;
+        }); <!-- add failure handling -->
+      });
+
+      osApp.controller('serversCtrl', function($scope, $http, $cookies){
+        $scope.servers = [];
+        $scope.sortField = 'name';
+        $scope.reverse = false;
+      });
+
+    </script>
+  </head>
+  <body ng-view>
+  </body>
+</html>
