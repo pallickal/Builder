@@ -29,9 +29,6 @@
           });
       });
 
-      osApp.run(function($http) {
-      });
-
       osApp.factory('session', function($http, $cookies) {
         function authenticate(userName, password, callback){
           var requestData = {
@@ -98,18 +95,31 @@
         };
       });
 
-      osApp.controller('tenantsCtrl', function($scope, $http, $cookies){
+      osApp.factory('tenants', function($http) {
+
+        function getData(callback) {
+          $http.get('http://192.168.122.183:5000/v2.0/tenants')
+          .success(function(data){
+            console.log('common $http headers in tenantsCtrl: \n', $http.defaults.headers.common)
+            console.log('Tenants response data:\n' + JSON.stringify(data, null, '  '));
+            callback(data);
+          }); <!-- add failure handling -->
+        };
+
+        return {
+          getData: getData
+        };
+      });
+
+      osApp.controller('tenantsCtrl', function($scope, $http, $cookies, tenants){
         $scope.tenants = [];
         $scope.sortField = 'name';
         $scope.reverse = false;
 
-        console.log('common $http headers in tenantsCtrl: \n', $http.defaults.headers.common)
-
-        $http.get('http://192.168.122.183:5000/v2.0/tenants')
-        .success(function(data){
-          console.log('Test response data:\n' + JSON.stringify(data, null, '  '));
+        tenants.getData(function(data) {
           $scope.tenants = data;
-        }); <!-- add failure handling -->
+        });
+
       });
 
       osApp.controller('serversCtrl', function($scope, $http, $cookies){
