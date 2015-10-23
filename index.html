@@ -13,14 +13,14 @@
         $routeProvider.
           when('/',{
             templateUrl: 'login.html',
-            <!-- need conditional - logged in ? redirect to /servers -->
+            <!-- logged in ? redirect to /first_tenant/servers -->
             controller: 'loginCtrl'
           }).
           when('/tenants',{
             templateUrl: 'tenants.html',
             controller: 'tenantsCtrl'
           }).
-          when('/servers',{
+          when('/:tenant_id/servers/',{
             templateUrl: 'servers.html',
             controller: 'serversCtrl'
           }).
@@ -29,7 +29,15 @@
           });
       });
 
-      osApp.factory('session', function($http, $cookies) {
+      osApp.factory('sessionFactory', function($http, $cookies) {
+        return {
+          authenticate: authenticate,
+          getTenantToken: getTenantToken
+        };
+
+        ////////
+
+        <!-- must implement caching and expiration for tokens -->
         function authenticate(userName, password, callback){
           var requestData = {
                             "auth": {
@@ -78,30 +86,50 @@
             }); <!-- add failure handling -->
         };
 
-        return {
-          authenticate: authenticate
-        };
+        function getToken() {
+          return $cookies.get('X-Subject-Token');
+        }
+
+        function getTenantToken(tenant_id, callback) {
+          var requestData = {
+            "auth": {
+              "token": {
+                "id": getToken()
+              },
+              "tenantId": tenant_id
+            }
+          };
+
+          console.log('sessionFactory:getTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
+
+          $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+            .success(function(data) {
+              console.log('sessionFactory:getTenantToken - Response data\n' + JSON.stringify(data, null, '  '));
+              $http.defaults.headers.common['X-Auth-Token'] = data.access.token.id;
+              callback(data.access.token.id);
+            });
+
+        }
       });
 
-      osApp.controller('loginCtrl', function($scope, $http, $cookies, $window, session){
+      osApp.controller('loginCtrl', function($scope, $http, $cookies, $window, sessionFactory){
         $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
         console.log('cookie: ' + $cookies.get('X-Auth-Token'));
 
         $scope.processFunction = function() {
-          session.authenticate($scope.formData.userName, $scope.formData.password, function() {
+          sessionFactory.authenticate($scope.formData.userName, $scope.formData.password, function() {
             $window.location.href = '#/tenants';
           });
         };
       });
 
-      osApp.factory('tenants', function($http) {
-
+      osApp.factory('tenantsFactory', function($http) {
         function getData(callback) {
           $http.get('http://192.168.122.183:5000/v2.0/tenants')
           .success(function(data){
-            console.log('common $http headers in tenantsCtrl: \n', $http.defaults.headers.common)
-            console.log('Tenants response data:\n' + JSON.stringify(data, null, '  '));
+            console.log('common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
+            console.log('tenantsFactory response data:\n' + JSON.stringify(data, null, '  '));
             callback(data);
           }); <!-- add failure handling -->
         };
@@ -111,21 +139,46 @@
         };
       });
 
-      osApp.controller('tenantsCtrl', function($scope, $http, $cookies, tenants){
+      osApp.controller('tenantsCtrl', function($scope, $http, $cookies, tenantsFactory){
         $scope.tenants = [];
         $scope.sortField = 'name';
         $scope.reverse = false;
 
-        tenants.getData(function(data) {
+        tenantsFactory.getData(function(data) {
           $scope.tenants = data;
         });
 
       });
 
-      osApp.controller('serversCtrl', function($scope, $http, $cookies){
-        $scope.servers = [];
+      osApp.factory('serversFactory', function($http, sessionFactory) {
+        function getData(tenant_id, callback) {
+          sessionFactory.getTenantToken(tenant_id, function(tenant_token) {
+            console.log('serversFactory:getData - sessionFactory:getTenantToken - ' + tenant_token);
+            // insert $http call to get tenant scoped servers and issue callback with servers hash
+          });
+        };
+
+        return {
+          getData: getData
+        };
+      });
+
+      osApp.controller('serversCtrl', function($scope, $routeParams, tenantsFactory, serversFactory){
+        $scope.tenants = {};
+
+        $scope.servers = {};
         $scope.sortField = 'name';
         $scope.reverse = false;
+
+        console.log('serversCtrl: $routeParams:\n' + JSON.stringify($routeParams, null, '  '));
+        tenantsFactory.getData(function(data) {
+          $scope.tenants = data;
+          if ($scope.tenants.tenants[0]) {
+            serversFactory.getData($scope.tenants.tenants[0].id, function(data) {
+              $scope.servers = data;
+            });
+          }
+        });
       });
 
     </script>

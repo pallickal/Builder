@@ -2,7 +2,8 @@ Search:<input ng-model="query" type="text">
 <table>
   <tr>
     <td><a href"" ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
-    <td><a href"" ng-click="sortField = 'enabled'; reverse = !reverse">Enabled</td>
+    <td><a href"" ng-click="sortField = 'enabled'; reverse = !reverse">Enabled</a></td>
+    <td>Servers</td>
   </tr>
   <tr ng-repeat="tenant in tenants.tenants | filter:query | orderBy:sortField:reverse" id="{{tenant.id}}">
     <td>
@@ -10,5 +11,6 @@ Search:<input ng-model="query" type="text">
     </td>
     <!-- add check for if server.links is an empty array or null -->
     <td>{{tenant.enabled}}</td>
+    <td><a href="#/{{tenant.id}}/servers">Show</a></td>
   </tr>
 </ul>
