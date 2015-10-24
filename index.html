@@ -39,12 +39,13 @@
 
         ////////
 
-        function persistToken(x_subject_token, expires_at) {
+        function persistToken(x_subject_token, expires_at, issued_at) {
           var token = $cookies.getObject('X-Subject-Token') || {};
 
           token = {
             'id': x_subject_token,
-            'expires_at': expires_at
+            'expires_at': expires_at,
+            'issued_at': issued_at
           };
 
           $cookies.putObject('X-Subject-Token', token, {expires: expires_at});
@@ -81,7 +82,7 @@
               console.log('sessionFactory:authenticate - Token response header:\n' + JSON.stringify(headers(), null, '  '));
               console.log('sessionFactory:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));
 
-              persistToken(headers('X-Subject-Token'), response.token.expires_at);
+              persistToken(headers('X-Subject-Token'), response.token.expires_at, response.token.issued_at);
               $http.defaults.headers.common['X-Auth-Token'] = headers('X-Subject-Token');
               callback();
             }); <!-- add failure handling -->
@@ -109,7 +110,7 @@
             .then(
               function(response, status, headers) {
                 console.log('sessionFactory:withToken:refreshToken:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
-                persistToken(response.data.access.token.id, response.data.access.token.expires);
+                persistToken(response.data.access.token.id, response.data.access.token.expires, response.data.access.token.issued_at);
                 callback(response.data.access.token.id);
               },
               function(response) {
@@ -121,17 +122,17 @@
 
           if (token) {
             var m_expires_at = moment(token.expires_at);
-            var till_expiration = m_expires_at.diff(moment(), 'minutes');
+            var min_till_exp = m_expires_at.diff(moment(), 'minutes');
 
             console.log(
               'sessionFactory:withToken - expires_at difference from current date/time = ' +
-              till_expiration
+              min_till_exp
             );
 
-            if (till_expiration <= 0) {
+            if (min_till_exp <= 0) {
               console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
               $window.location.href = '#/login';
-            } else if (till_expiration > 2) {
+            } else if (min_till_exp > 2) {
               $http.defaults.headers.common['X-Auth-Token'] = token.id;
               callback(token.id);
               callback = function() {};
@@ -155,10 +156,11 @@
               JSON.stringify($cookies.getObject(tenant_id), null, '  ')
             );
 
-            function persistTenantToken(tenant_token, expires_at) {
+            function persistTenantToken(tenant_token, expires_at, issued_at) {
               token = {
                 'id': tenant_token,
-                'expires_at': expires_at
+                'expires_at': expires_at,
+                'issued_at': issued_at
               };
 
               $cookies.putObject(tenant_id, token, {expires: expires_at});
@@ -184,7 +186,7 @@
                 .then(
                   function(response) {
                     console.log('sessionFactory:withTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
-                    persistTenantToken(response.data.access.token.id, response.data.access.token.expires);
+                    persistTenantToken(response.data.access.token.id, response.data.access.token.expires, response.data.access.token.issued_at);
                     $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
                     callback(response.data.access.token.id);
                   },
@@ -196,20 +198,20 @@
 
               if (token) {
                 var m_expires_at = moment(token.expires_at);
-                var till_expiration = m_expires_at.diff(moment(), 'minutes');
+                var min_till_exp = m_expires_at.diff(moment(), 'minutes');
 
                 console.log(
                   'sessionFactory:withToken - expires_at difference from current date/time = ' +
-                  till_expiration
+                  min_till_exp
                 );
 
-                if (till_expiration > 2) {
+                if (min_till_exp > 2) {
                   $http.defaults.headers.common['X-Auth-Token'] = token.id;
                   callback(token.id);
                   callback = function() {};
                   refreshTenantToken();
                 } else {
-                  if (till_expiration <= 0) {
+                  if (min_till_exp <= 0) {
                     console.log('sessionFactory:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
                   }
                   refreshTenantToken();
