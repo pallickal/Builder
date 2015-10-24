@@ -177,19 +177,19 @@
       });
 
       osApp.factory('tenantsFactory', function($http, sessionFactory) {
-        function getData(callback) {
+        function withData(callback) {
           sessionFactory.withToken(function(token_id) {
             $http.get('http://192.168.122.183:5000/v2.0/tenants')
             .success(function(response){
-              console.log('tenantsFactory:getData common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
-              console.log('tenantsFactory:getData Response:\n' + JSON.stringify(response, null, '  '));
+              console.log('tenantsFactory:withData common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
+              console.log('tenantsFactory:withData Response:\n' + JSON.stringify(response, null, '  '));
               callback(response);
             }); <!-- add failure handling -->
           });
         };
 
         return {
-          getData: getData
+          withData: withData
         };
       });
 
@@ -198,16 +198,16 @@
         $scope.sortField = 'name';
         $scope.reverse = false;
 
-        tenantsFactory.getData(function(data) {
+        tenantsFactory.withData(function(data) {
           $scope.tenants = data;
         });
 
       });
 
       osApp.factory('serversFactory', function($http, sessionFactory) {
-        function getData(tenant_id, callback) {
+        function withData(tenant_id, callback) {
           sessionFactory.withTenantToken(tenant_id, function(tenant_token) {
-            console.log('serversFactory:getData - sessionFactory:getTenantToken - ' + tenant_token);
+            console.log('serversFactory:withData - sessionFactory:getTenantToken - ' + tenant_token);
             $http.get('http://192.168.122.183:8774/v2.1/' + tenant_id + '/servers')
               .success(function(response) {
                 console.log('common $http headers in serversFactory: \n', $http.defaults.headers.common)
@@ -218,7 +218,7 @@
         };
 
         return {
-          getData: getData
+          withData: withData
         };
       });
 
@@ -230,10 +230,10 @@
         $scope.reverse = false;
 
         console.log('serversCtrl: $routeParams:\n' + JSON.stringify($routeParams, null, '  '));
-        tenantsFactory.getData(function(data) {
+        tenantsFactory.withData(function(data) {
           $scope.tenants = data;
           if ($scope.tenants.tenants[0]) {
-            serversFactory.getData($scope.tenants.tenants[0].id, function(data) {
+            serversFactory.withData($scope.tenants.tenants[0].id, function(data) {
               $scope.servers = data;
             });
           }
