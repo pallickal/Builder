@@ -6,12 +6,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-cookies.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-route.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
     <script>
       var osApp = angular.module('osApp', ['ngCookies', 'ngRoute']);
 
       osApp.config(function($routeProvider) {
         $routeProvider.
-          when('/',{
+          when('/login',{
             templateUrl: 'login.html',
             <!-- logged in ? redirect to /first_tenant/servers -->
             controller: 'loginCtrl'
@@ -25,20 +26,37 @@
             controller: 'serversCtrl'
           }).
           otherwise({
-            redirectTo: '/'
+            redirectTo: '/login'
           });
       });
 
-      osApp.factory('sessionFactory', function($http, $cookies) {
+      osApp.factory('sessionFactory', function($http, $cookies, $cacheFactory, $window) {
         return {
           authenticate: authenticate,
-          getTenantToken: getTenantToken
+          withToken: withToken,
+          withTenantToken: withTenantToken
         };
 
         ////////
 
-        <!-- must implement caching and expiration for tokens -->
-        function authenticate(userName, password, callback){
+        function persistToken(x_subject_token, expires_at) {
+          var token = $cookies.getObject('X-Subject-Token') || {};
+
+          token = {
+            'id': x_subject_token,
+            'expires_at': expires_at
+          };
+
+          $cookies.putObject('X-Subject-Token', token, {expires: expires_at});
+          console.log(
+            "sessionFactory:persistToken - |X-Subject-Token| = " +
+            JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
+          );
+
+          $http.defaults.headers.common['X-Auth-Token'] = x_subject_token;
+        }
+
+        function authenticate(userName, password, callback) {
           var requestData = {
                             "auth": {
                               "identity": {
@@ -58,64 +76,98 @@
                             }
                           };
 
-          console.log(JSON.stringify(requestData, null, '  '));
+          console.log('sessionFactory:authenticate - requestData:\n' + JSON.stringify(requestData, null, '  '));
 
           $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
-            .success(function(data, status, headers){
-              console.log('Token response header:\n' + JSON.stringify(headers(), null, '  '));
-              console.log('Token response data:\n' + JSON.stringify(data, null, '  '));
+            .success(function(response, status, headers) {
+              console.log('sessionFactory:authenticate - Token response header:\n' + JSON.stringify(headers(), null, '  '));
+              console.log('sessionFactory:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));
 
-              $http.defaults.headers.common['X-Auth-Token'] = headers('X-Subject-Token');
-
-              $cookies.put('X-Subject-Token', headers('X-Subject-Token'));
-              console.log('|X-Subject-Token| = ' + $cookies.get('X-Subject-Token'));
-
-              $cookies.put('X-Subject-Token-Expires', data.token.expires_at);
-              console.log('|X-Subject-Token-Expires| = ' + $cookies.get('X-Subject-Token-Expires'));
-
-              $cookies.put('user_id', data.token.user.id);
-              console.log('|user_id| = ' + $cookies.get('user_id'));
-
-              $cookies.putObject('user', {
-                "user_id": data.token.user.id,
-                "X-Auth-Token": headers('X-Subject-Token')
-                <!-- Add token expiration date/time -->
-              });
-              console.log('|user| = ' + JSON.stringify($cookies.getObject('user'), null,' '));
+              persistToken(headers('X-Subject-Token'), response.token.expires_at);
               callback();
             }); <!-- add failure handling -->
         };
 
-        function getToken() {
-          return $cookies.get('X-Subject-Token');
-        }
+        function withToken(callback) {
+          var token = $cookies.getObject('X-Subject-Token');
 
-        function getTenantToken(tenant_id, callback) {
-          var requestData = {
-            "auth": {
-              "token": {
-                "id": getToken()
-              },
-              "tenantId": tenant_id
+          console.log(
+            "sessionFactory:withToken - |X-Subject-Token| = " +
+            JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
+          );
+
+          if (token) {
+            var m_expires_at = moment(token.expires_at);
+            var till_expiration = m_expires_at.diff(moment(), 'minutes');
+
+            console.log(
+              'sessionFactory:withToken - expires_at difference from current date/time = ' +
+              till_expiration
+            );
+
+            if (till_expiration <= 0) {
+              console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
+              $window.location.href = '#/login';
+            } else {  // renew token with existing token
+              var requestData = {
+                "auth": {
+                  "token": {
+                    "id": token.id
+                  }
+                }
+              };
+              $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+              .then(
+                function(response, status, headers) {
+                  console.log('sessionFactory:withToken:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
+                  persistToken(response.data.access.token.id, response.data.access.token.expires);
+                  callback(response.data.access.token.id);
+                },
+                function(response) {
+                  console.log('sessionFactory:withToken:postError - Response:\n' + response);
+                  $window.location.href = '#/login';
+                }
+              );  // redirect to sign in on failure
             }
-          };
-
-          console.log('sessionFactory:getTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
-
-          $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
-            .success(function(data) {
-              console.log('sessionFactory:getTenantToken - Response data\n' + JSON.stringify(data, null, '  '));
-              $http.defaults.headers.common['X-Auth-Token'] = data.access.token.id;
-              callback(data.access.token.id);
-            });
-
+          } else {
+            console.log('sessionFactory:withToken - Token never existed or expired');
+            $window.location.href = '#/login';
+          }
         }
+
+        function withTenantToken(tenant_id, callback) {
+          withToken(function(token_id) {
+            var requestData = {
+              "auth": {
+                "token": {
+                  "id": token_id
+                },
+                "tenantId": tenant_id
+              }
+            };
+
+            console.log('sessionFactory:getTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
+
+            $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+            .then(
+              function(response) {
+                console.log('sessionFactory:getTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
+                $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
+                callback(response.data.access.token.id);
+              },
+              function(response) {
+                console.log('sessionFactory:withTenantToken - Could not get tenant scoped token');
+              }
+            );
+          });
+        }
+
       });
 
       osApp.controller('loginCtrl', function($scope, $http, $cookies, $window, sessionFactory){
         $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
-        console.log('cookie: ' + $cookies.get('X-Auth-Token'));
+        console.log('loginCtrl: |X-Subject-Token| = ' + JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  '));
 
         $scope.processFunction = function() {
           sessionFactory.authenticate($scope.formData.userName, $scope.formData.password, function() {
@@ -124,14 +176,16 @@
         };
       });
 
-      osApp.factory('tenantsFactory', function($http) {
+      osApp.factory('tenantsFactory', function($http, sessionFactory) {
         function getData(callback) {
-          $http.get('http://192.168.122.183:5000/v2.0/tenants')
-          .success(function(data){
-            console.log('common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
-            console.log('tenantsFactory response data:\n' + JSON.stringify(data, null, '  '));
-            callback(data);
-          }); <!-- add failure handling -->
+          sessionFactory.withToken(function(token_id) {
+            $http.get('http://192.168.122.183:5000/v2.0/tenants')
+            .success(function(response){
+              console.log('tenantsFactory:getData common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
+              console.log('tenantsFactory:getData Response:\n' + JSON.stringify(response, null, '  '));
+              callback(response);
+            }); <!-- add failure handling -->
+          });
         };
 
         return {
@@ -152,13 +206,13 @@
 
       osApp.factory('serversFactory', function($http, sessionFactory) {
         function getData(tenant_id, callback) {
-          sessionFactory.getTenantToken(tenant_id, function(tenant_token) {
+          sessionFactory.withTenantToken(tenant_id, function(tenant_token) {
             console.log('serversFactory:getData - sessionFactory:getTenantToken - ' + tenant_token);
             $http.get('http://192.168.122.183:8774/v2.1/' + tenant_id + '/servers')
-              .success(function(data) {
+              .success(function(response) {
                 console.log('common $http headers in serversFactory: \n', $http.defaults.headers.common)
-                console.log('Servers response data:\n' + JSON.stringify(data, null, '  '));
-                callback(data);
+                console.log('Servers response:\n' + JSON.stringify(response, null, '  '));
+                callback(response);
               }); <!-- add failure handling -->
           });
         };
