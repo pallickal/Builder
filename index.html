@@ -139,6 +139,7 @@
             } else {  // renew token with existing token
               refreshToken();
             }
+
           } else {
             console.log('sessionFactory:withToken - Token never existed or expired');
             $window.location.href = '#/login';
@@ -147,20 +148,14 @@
 
         function withTenantToken(tenant_id, callback) {
           withToken(function(token_id) {
-            var requestData = {
-              "auth": {
-                "token": {
-                  "id": token_id
-                },
-                "tenantId": tenant_id
-              }
-            };
+            var token = $cookies.getObject(tenant_id) || {};
 
-            console.log('sessionFactory:getTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
+            console.log(
+              'sessionFactory:withTenantToken - |' + tenant_id + '| = ' +
+              JSON.stringify($cookies.getObject(tenant_id), null, '  ')
+            );
 
             function persistTenantToken(tenant_token, expires_at) {
-              var token = $cookies.getObject(tenant_id) || {};
-
               token = {
                 'id': tenant_token,
                 'expires_at': expires_at
@@ -173,18 +168,58 @@
               );
             }
 
-            $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
-            .then(
-              function(response) {
-                console.log('sessionFactory:getTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
-                persistTenantToken(response.data.access.token.id, response.data.access.token.expires);
-                $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
-                callback(response.data.access.token.id);
-              },
-              function(response) {
-                console.log('sessionFactory:withTenantToken - Could not get tenant scoped token');
+            function refreshTenantToken() {
+              var requestData = {
+                "auth": {
+                  "token": {
+                    "id": token_id
+                  },
+                  "tenantId": tenant_id
+                }
+              };
+              console.log('sessionFactory:withTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
+
+              $http.defaults.headers.common['X-Auth-Token'] = token_id;
+              $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+                .then(
+                  function(response) {
+                    console.log('sessionFactory:withTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
+                    persistTenantToken(response.data.access.token.id, response.data.access.token.expires);
+                    $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
+                    callback(response.data.access.token.id);
+                  },
+                  function(response) {
+                    console.log('sessionFactory:withTenantToken - Could not get tenant scoped token');
+                  }
+                );
               }
-            );
+
+              if (token) {
+                var m_expires_at = moment(token.expires_at);
+                var till_expiration = m_expires_at.diff(moment(), 'minutes');
+
+                console.log(
+                  'sessionFactory:withToken - expires_at difference from current date/time = ' +
+                  till_expiration
+                );
+
+                if (till_expiration > 2) {
+                  $http.defaults.headers.common['X-Auth-Token'] = token.id;
+                  callback(token.id);
+                  callback = function() {};
+                  refreshTenantToken();
+                } else {
+                  if (till_expiration <= 0) {
+                    console.log('sessionFactory:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
+                  }
+                  refreshTenantToken();
+                }
+
+              } else {
+                console.log('sessionFactory:withToken - Token never existed or expired');
+                refreshTenantToken();
+              }
+
           });
         }
 
@@ -233,7 +268,7 @@
       osApp.factory('serversFactory', function($http, sessionFactory) {
         function withData(tenant_id, callback) {
           sessionFactory.withTenantToken(tenant_id, function(tenant_token) {
-            console.log('serversFactory:withData - sessionFactory:getTenantToken - ' + tenant_token);
+            console.log('serversFactory:withData - sessionFactory:withTenantToken - ' + tenant_token);
             $http.get('http://192.168.122.183:8774/v2.1/' + tenant_id + '/servers')
               .success(function(response) {
                 console.log('common $http headers in serversFactory: \n', $http.defaults.headers.common)
