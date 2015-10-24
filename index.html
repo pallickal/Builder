@@ -158,10 +158,26 @@
 
             console.log('sessionFactory:getTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
 
+            function persistTenantToken(tenant_token, expires_at) {
+              var token = $cookies.getObject(tenant_id) || {};
+
+              token = {
+                'id': tenant_token,
+                'expires_at': expires_at
+              };
+
+              $cookies.putObject(tenant_id, token, {expires: expires_at});
+              console.log(
+                'sessionFactory:withTenantToken:persistTenantToken - |' + tenant_id + '| = ' +
+                JSON.stringify($cookies.getObject(tenant_id), null, '  ')
+              );
+            }
+
             $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
             .then(
               function(response) {
                 console.log('sessionFactory:getTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
+                persistTenantToken(response.data.access.token.id, response.data.access.token.expires);
                 $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
                 callback(response.data.access.token.id);
               },
