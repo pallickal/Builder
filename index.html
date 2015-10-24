@@ -52,8 +52,6 @@
             "sessionFactory:persistToken - |X-Subject-Token| = " +
             JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
           );
-
-          $http.defaults.headers.common['X-Auth-Token'] = x_subject_token;
         }
 
         function authenticate(userName, password, callback) {
@@ -84,6 +82,7 @@
               console.log('sessionFactory:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));
 
               persistToken(headers('X-Subject-Token'), response.token.expires_at);
+              $http.defaults.headers.common['X-Auth-Token'] = headers('X-Subject-Token');
               callback();
             }); <!-- add failure handling -->
         };
@@ -95,6 +94,30 @@
             "sessionFactory:withToken - |X-Subject-Token| = " +
             JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
           );
+
+          function refreshToken() {
+            var requestData = {
+              "auth": {
+                "token": {
+                  "id": token.id
+                }
+              }
+            };
+
+            $http.defaults.headers.common['X-Auth-Token'] = token.id;
+            $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+            .then(
+              function(response, status, headers) {
+                console.log('sessionFactory:withToken:refreshToken:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
+                persistToken(response.data.access.token.id, response.data.access.token.expires);
+                callback(response.data.access.token.id);
+              },
+              function(response) {
+                console.log('sessionFactory:withToken:refreshToken:postError - Response:\n' + response);
+                $window.location.href = '#/login';
+              }
+            );  // redirect to sign in on failure
+          }
 
           if (token) {
             var m_expires_at = moment(token.expires_at);
@@ -108,26 +131,13 @@
             if (till_expiration <= 0) {
               console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
               $window.location.href = '#/login';
+            } else if (till_expiration > 2) {
+              $http.defaults.headers.common['X-Auth-Token'] = token.id;
+              callback(token.id);
+              callback = function() {};
+              refreshToken();
             } else {  // renew token with existing token
-              var requestData = {
-                "auth": {
-                  "token": {
-                    "id": token.id
-                  }
-                }
-              };
-              $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
-              .then(
-                function(response, status, headers) {
-                  console.log('sessionFactory:withToken:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
-                  persistToken(response.data.access.token.id, response.data.access.token.expires);
-                  callback(response.data.access.token.id);
-                },
-                function(response) {
-                  console.log('sessionFactory:withToken:postError - Response:\n' + response);
-                  $window.location.href = '#/login';
-                }
-              );  // redirect to sign in on failure
+              refreshToken();
             }
           } else {
             console.log('sessionFactory:withToken - Token never existed or expired');
