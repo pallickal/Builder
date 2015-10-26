@@ -1,18 +1,26 @@
 angular.module('tenants', [])
-  .factory('tenantsFactory', function($http, sessionFactory) {
-    function withData(callback) {
-      sessionFactory.withToken(function(token_id) {
-        $http.get('http://192.168.122.183:5000/v2.0/tenants')
-        .success(function(response){
-          console.log('tenantsFactory:withData common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
-          console.log('tenantsFactory:withData Response:\n' + JSON.stringify(response, null, '  '));
-          callback(response);
-        }); <!-- add failure handling -->
-      });
+  .factory('tenantsFactory', function($http, $q, $window, sessionFactory) {
+    return {
+      list: list
     };
 
-    return {
-      withData: withData
+    function list() {
+      var deferred = $q.defer();
+      sessionFactory.withToken()
+        .then(function(token_id) {
+          $http.get('http://192.168.122.183:5000/v2.0/tenants')
+            .then(function(response){
+              console.log('tenantsFactory:list common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
+              console.log('tenantsFactory:list Response:\n' + JSON.stringify(response, null, '  '));
+              deferred.resolve(response.data);
+            }, function(err_response) {
+              deferred.reject(err_response);
+            });
+        }, function(error) {
+          console.log('tenantsFactory:list - Error from withToken =\n', error);
+          $window.location.href = '#/login';
+        });
+      return deferred.promise;
     };
   })
   .controller('tenantsCtrl', function($scope, $http, $cookies, tenantsFactory){
@@ -20,7 +28,11 @@ angular.module('tenants', [])
     $scope.sortField = 'name';
     $scope.reverse = false;
 
-    tenantsFactory.withData(function(data) {
-      $scope.tenants = data;
-    });
+    tenantsFactory.list()
+      .then(function(data) {
+        console.log('tenantsCtrl Response:\n' + JSON.stringify(data, null, '  '));
+        $scope.tenants = data;
+      }, function(error) {
+        console.log('tenantsCtrl Error response:\n' + JSON.stringify(error, null, '  '));
+      });
   });
