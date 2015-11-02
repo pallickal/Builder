@@ -1,9 +1,18 @@
 angular.module('tenantTokens', ['token', 'session'])
   .service('tenantTokensService', function($interval, $http, $cookies, tokenService) {
     return {
+      get: get,
       setDirty: setDirty,
       renew: renew
     };
+
+    function get(tenant_id) {
+      console.log(
+        'tenantTokensService:get - |' + tenant_id + '| = ' +
+        JSON.stringify($cookies.getObject(tenant_id), null, '  ')
+      );
+      return $cookies.getObject(tenant_id);
+    }
 
     function setDirty(tenant_id) {
       console.log('tenantTokensService:setDirty - setting tenant ' + tenant_id + ' token dirty');

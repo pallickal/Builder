@@ -2,6 +2,7 @@ angular.module('token', [])
   .service('tokenService', function($interval, $q, $http, $cookies) {
     return {
       init: init,
+      get: get,
       setDirty: setDirty,
       renew: renew
     };
@@ -41,6 +42,14 @@ angular.module('token', [])
           deferred.reject('tokenService:get - HTTP failure response:' + JSON.stringify(err_response, null, '  '))
         });
       return deferred.promise;
+    }
+
+    function get() {
+      console.log(
+        "tokenService:get - |X-Subject-Token| = " +
+        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
+      );
+      return $cookies.getObject('X-Subject-Token');
     }
 
     function setDirty() {

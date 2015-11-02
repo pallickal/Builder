@@ -1,5 +1,5 @@
 angular.module('session', ['token', 'tenantTokens'])
-  .factory('sessionFactory', function($http, $cookies, $cacheFactory, $q, $window, tokenService, tenantTokensService) {
+  .factory('sessionFactory', function($http, $cacheFactory, $q, $window, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
       withToken: withToken,
@@ -12,12 +12,7 @@ angular.module('session', ['token', 'tenantTokens'])
 
     function withToken() {
       var deferred = $q.defer();
-      var token = $cookies.getObject('X-Subject-Token');
-
-      console.log(
-        "sessionFactory:withToken - |X-Subject-Token| = " +
-        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
-      );
+      var token = tokenService.get();
 
       if (token) {
         var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
@@ -70,12 +65,7 @@ angular.module('session', ['token', 'tenantTokens'])
 
     function withTenantToken(tenant_id) {
       var deferred = $q.defer();
-      var token = $cookies.getObject(tenant_id);
-
-      console.log(
-        'sessionFactory:withTenantToken - |' + tenant_id + '| = ' +
-        JSON.stringify($cookies.getObject(tenant_id), null, '  ')
-      );
+      var token = tenantTokensService.get();
 
       function renew() {
         withToken()
