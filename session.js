@@ -1,64 +1,13 @@
-angular.module('session', [])
-  .factory('sessionFactory', function($http, $cookies, $cacheFactory, $q, $window) {
+angular.module('session', ['token'])
+  .factory('sessionFactory', function($http, $cookies, $cacheFactory, $q, $window, tokenService) {
     return {
       authenticate: authenticate,
       withToken: withToken,
       withTenantToken: withTenantToken
     };
 
-    ////////
-
-    function persistToken(x_subject_token, expires_at) {
-      var token = $cookies.getObject('X-Subject-Token') || {};
-
-      token = {
-        'id': x_subject_token,
-        'expires_at': expires_at,
-        'stored_at': moment().toISOString()
-      };
-
-      $cookies.putObject('X-Subject-Token', token, {expires: expires_at});
-      console.log(
-        "sessionFactory:persistToken - |X-Subject-Token| = " +
-        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
-      );
-    }
-
-    function authenticate(userName, password, callback) {
-      var deferred = $q.defer();
-      var requestData = {
-                        "auth": {
-                          "identity": {
-                            "methods": [
-                              "password"
-                            ],
-                            "password": {
-                              "user": {
-                                "domain": {
-                                  "name": "default"
-                                },
-                                "name": userName,
-                                "password": password
-                              }
-                            }
-                          }
-                        }
-                      };
-
-      console.log('sessionFactory:authenticate - requestData:\n' + JSON.stringify(requestData, null, '  '));
-
-      $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
-        .then(function(response) {
-          console.log('sessionFactory:authenticate - Token response header:\n' + JSON.stringify(response.headers(), null, '  '));
-          console.log('sessionFactory:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));
-
-          persistToken(response.headers('X-Subject-Token'), response.data.token.expires_at);
-          $http.defaults.headers.common['X-Auth-Token'] = response.headers('X-Subject-Token');
-          deferred.resolve();
-        }, function(err_response) {
-          deferred.reject('sessionFactory:authenticate - HTTP failure response:' + JSON.stringify(err_response, null, '  '))
-        });
-      return deferred.promise;
+    function authenticate(userName, password) {
+      return tokenService.init(userName, password);
     };
 
     function withToken() {
@@ -69,30 +18,6 @@ angular.module('session', [])
         "sessionFactory:withToken - |X-Subject-Token| = " +
         JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
       );
-
-      function renewToken() {
-        var requestData = {
-          "auth": {
-            "token": {
-              "id": token.id
-            }
-          }
-        };
-
-        $http.defaults.headers.common['X-Auth-Token'] = token.id;
-        $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
-        .then(
-          function(response) {
-            console.log('sessionFactory:withToken:renewToken:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
-            persistToken(response.data.access.token.id, response.data.access.token.expires);
-            deferred.resolve(response.data.access.token.id);
-          },
-          function(response) {
-            console.log('sessionFactory:withToken:renewToken:postError - Response:\n' + response);
-            deferred.reject(response);
-          }
-        );  // redirect to sign in on failure
-      }
 
       if (token) {
         var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
@@ -130,12 +55,10 @@ angular.module('session', [])
           console.log('sessionFactory:withToken - Delaying refresh. > 2 minutes till expiration.');
           $http.defaults.headers.common['X-Auth-Token'] = token.id;
           deferred.resolve(token.id);
-//        replace with code to set a token "dirty" flag so it can be refreshed within 30 sec by polling
-//          callback = function() {};
-//          renewToken();
+          tokenService.setDirty();
         } else {
           console.log('sessionFactory:withToken - < 2 minutes till expiration. Refresh first.');
-          renewToken();
+          tokenService.renew(deferred);
         }
 
       } else {
@@ -147,7 +70,7 @@ angular.module('session', [])
 
     function withTenantToken(tenant_id, callback) {
       var deferred = $q.defer();
-      var token = $cookies.getObject(tenant_id) || {};
+      var token = $cookies.getObject(tenant_id);
 
       console.log(
         'sessionFactory:withTenantToken - |' + tenant_id + '| = ' +
@@ -157,6 +80,7 @@ angular.module('session', [])
       function persistTenantToken(tenant_token, expires_at, stored_at) {
         token = {
           'id': tenant_token,
+          'dirty': false,
           'expires_at': expires_at,
           'stored_at': moment().toISOString()
         };
