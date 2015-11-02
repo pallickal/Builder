@@ -125,18 +125,4 @@ angular.module('session', ['token', 'tenantTokens'])
       return deferred.promise;
     }
 
-  })
-  .controller('loginCtrl', function($scope, $http, $cookies, $window, sessionFactory){
-    $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
-
-    console.log('loginCtrl: |X-Subject-Token| = ' + JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  '));
-
-    $scope.processFunction = function() {
-      sessionFactory.authenticate($scope.formData.userName, $scope.formData.password)
-        .then(function() {
-          $window.location.href = '#/tenants';
-        }, function(error) {
-          console.log('loginCtrl: - Error from sessionFactory:authenticate:' + error);
-        });
-    };
   });

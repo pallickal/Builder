@@ -1,4 +1,4 @@
-angular.module('osApp', ['ngRoute', 'ngCookies', 'session', 'tenants', 'servers'])
+angular.module('osApp', ['ngRoute', 'ngCookies', 'login', 'session', 'tenants', 'servers'])
   .config(function($routeProvider) {
     $routeProvider.
       when('/login',{
