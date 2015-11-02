@@ -2,16 +2,16 @@ angular.module('osApp', ['ngRoute', 'ngCookies', 'login', 'session', 'tenants', 
   .config(function($routeProvider) {
     $routeProvider.
       when('/login',{
-        templateUrl: 'login.html',
+        templateUrl: 'app/login/login.html',
         <!-- logged in ? redirect to /first_tenant/servers -->
         controller: 'loginCtrl'
       }).
       when('/tenants',{
-        templateUrl: 'tenants.html',
+        templateUrl: 'app/tenants/tenants.html',
         controller: 'tenantsCtrl'
       }).
       when('/:tenant_id/servers/',{
-        templateUrl: 'servers.html',
+        templateUrl: 'app/servers/servers.html',
         controller: 'serversCtrl'
       }).
       otherwise({
