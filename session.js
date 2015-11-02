@@ -1,5 +1,5 @@
-angular.module('session', ['token'])
-  .factory('sessionFactory', function($http, $cookies, $cacheFactory, $q, $window, tokenService) {
+angular.module('session', ['token', 'tenantTokens'])
+  .factory('sessionFactory', function($http, $cookies, $cacheFactory, $q, $window, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
       withToken: withToken,
@@ -68,7 +68,7 @@ angular.module('session', ['token'])
       return deferred.promise;
     }
 
-    function withTenantToken(tenant_id, callback) {
+    function withTenantToken(tenant_id) {
       var deferred = $q.defer();
       var token = $cookies.getObject(tenant_id);
 
@@ -77,50 +77,14 @@ angular.module('session', ['token'])
         JSON.stringify($cookies.getObject(tenant_id), null, '  ')
       );
 
-      function persistTenantToken(tenant_token, expires_at, stored_at) {
-        token = {
-          'id': tenant_token,
-          'dirty': false,
-          'expires_at': expires_at,
-          'stored_at': moment().toISOString()
-        };
-
-        $cookies.putObject(tenant_id, token, {expires: expires_at});
-        console.log(
-          'sessionFactory:withTenantToken:persistTenantToken - |' + tenant_id + '| = ' +
-          JSON.stringify($cookies.getObject(tenant_id), null, '  ')
-        );
-      }
-
-      function refreshTenantToken() {
+      function renew() {
         withToken()
           .then(function(token_id) {
-            var requestData = {
-              "auth": {
-                "token": {
-                  "id": token_id
-                },
-                "tenantId": tenant_id
-              }
-            };
-            console.log('sessionFactory:withTenantToken - Request data\n' + JSON.stringify(requestData, null, '  '));
-
-            $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
-              .then(
-                function(response) {
-                  console.log('sessionFactory:withTenantToken - Response:\n' + JSON.stringify(response, null, '  '));
-                  persistTenantToken(response.data.access.token.id, response.data.access.token.expires);
-                  $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
-                  deferred.resolve(response.data.access.token.id);
-                },
-                function(response) {
-                  console.log('sessionFactory:withTenantToken - Could not get tenant scoped token');
-                  deferred.reject('sessionFactory:withTenantToken - Could not get tenant scoped token');
-                }
-              );
-            }, function(error) {
-              console.log('sessionFactory:withTenantToken:refreshTenantToken - Rejected promise from withToken, error:\n' + error)
-            });
+            tenantTokensService.renew(token_id, tenant_id, deferred);
+          }, function(error) {
+            console.log('sessionFactory:withTenantToken:refreshTenantToken - Rejected promise from withToken, error:\n' + error)
+            deferred.reject(error);
+          });
       }
 
       if (token) {
@@ -144,21 +108,19 @@ angular.module('session', ['token'])
           console.log('sessionFactory:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
           $http.defaults.headers.common['X-Auth-Token'] = token.id;
           deferred.resolve(token.id);
-          //        replace with code to set a token "dirty" flag so it can be refreshed within 30 sec by polling
-//              callback = function() {};
-//              refreshTenantToken();
+          tenantTokensService.setDirty(tenant_id);
         } else {
           if (min_till_exp <= 0) {
             console.log('sessionFactory:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
           } else {
             console.log('sessionFactory:withTenantToken - < 2 minutes till expiration, refresh first.');
           }
-          refreshTenantToken();
+          renew();
         }
 
       } else {
         console.log('sessionFactory:withTenantToken - Token never existed or expired');
-        refreshTenantToken();
+        renew();
       }
       return deferred.promise;
     }
