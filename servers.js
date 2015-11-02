@@ -23,30 +23,17 @@ angular.module('servers', [])
     return deferred.promise;
   };
 })
-.controller('serversCtrl', function($scope, $routeParams, tenantsFactory, serversFactory){
-  $scope.tenants = {};
-
+.controller('serversCtrl', function($scope, $routeParams, serversFactory){
   $scope.servers = {};
   $scope.sortField = 'name';
   $scope.reverse = false;
 
   console.log('serversCtrl: $routeParams:\n' + JSON.stringify($routeParams, null, '  '));
-  tenantsFactory.list()
+  serversFactory.list($routeParams.tenant_id)
     .then(function(data) {
-      console.log('serversCtrl:tenantsFactory.list Data:\n' + JSON.stringify(data, null, '  '));
-      $scope.tenants = data;
-      if ($scope.tenants.tenants[0]) {
-        serversFactory.list($scope.tenants.tenants[0].id)
-          .then(function(data) {
-            console.log('serversCtrl:serversFactory.list Data:\n' + JSON.stringify(data, null, '  '));
-            $scope.servers = data;
-          }, function(error) {
-            console.log('serversCtrl:serversFactory.list Error:\n' + JSON.stringify(error, null, '  '));
-          });
-      } else {
-        console.log('serversCtrl:tenantsFactory.list $scope.tenants.tenants[0] undefined - $scope.tenants = :\n' + JSON.stringify(data, null, '  '));
-      }
+      console.log('serversCtrl:serversFactory.list Data:\n' + JSON.stringify(data, null, '  '));
+      $scope.servers = data;
     }, function(error) {
-      console.log('serversCtrl:tenantsFactory.list Error:\n' + JSON.stringify(error, null, '  '));
+      console.log('serversCtrl:serversFactory.list Error:\n' + JSON.stringify(error, null, '  '));
     });
 });
