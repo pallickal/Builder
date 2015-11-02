@@ -1,5 +1,5 @@
 angular.module('session', ['token', 'tenantTokens'])
-  .factory('sessionFactory', function($http, $cacheFactory, $q, $window, tokenService, tenantTokensService) {
+  .factory('sessionFactory', function($http, $q, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
       withToken: withToken,

@@ -1,4 +1,4 @@
-angular.module('tenantTokens', ['token', 'session'])
+angular.module('tenantTokens', ['token'])
   .service('tenantTokensService', function($interval, $http, $cookies, tokenService) {
     return {
       get: get,
