@@ -1,49 +1,12 @@
 angular.module('token', [])
   .service('tokenService', function($interval, $q, $http, $cookies) {
     return {
-      init: init,
       get: get,
       setDirty: setDirty,
       renew: renew,
-      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders
+      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
+      persist: persist
     };
-
-    function init(userName, password) {
-      var deferred = $q.defer();
-      var requestData = {
-                        "auth": {
-                          "identity": {
-                            "methods": [
-                              "password"
-                            ],
-                            "password": {
-                              "user": {
-                                "domain": {
-                                  "name": "default"
-                                },
-                                "name": userName,
-                                "password": password
-                              }
-                            }
-                          }
-                        }
-                      };
-
-      console.log('tokenService:get - requestData:\n' + JSON.stringify(requestData, null, '  '));
-
-      $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
-        .then(function(response) {
-          console.log('tokenService:get - Token response header:\n' + JSON.stringify(response.headers(), null, '  '));
-          console.log('tokenService:get - Token response:\n' + JSON.stringify(response, null, '  '));
-
-          persist(response.headers('X-Subject-Token'), response.data.token.expires_at);
-          $http.defaults.headers.common['X-Auth-Token'] = response.headers('X-Subject-Token');
-          deferred.resolve();
-        }, function(err_response) {
-          deferred.reject('tokenService:get - HTTP failure response:\n' + JSON.stringify(err_response, null, '  '))
-        });
-      return deferred.promise;
-    }
 
     function get() {
       console.log(

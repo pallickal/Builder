@@ -1,5 +1,5 @@
-angular.module('session', ['token', 'tenantTokens', 'tokensPolling'])
-  .factory('sessionFactory', function($q, tokenService, tenantTokensService) {
+angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
+  .factory('sessionFactory', function($q, userService, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
       withToken: withToken,
@@ -7,7 +7,7 @@ angular.module('session', ['token', 'tenantTokens', 'tokensPolling'])
     };
 
     function authenticate(userName, password) {
-      return tokenService.init(userName, password);
+      return userService.authenticate(userName, password);
     };
 
     function withToken() {
