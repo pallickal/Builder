@@ -49,9 +49,6 @@ angular.module('tenantTokens', ['token'])
         );
     }
 
-    // ugly hack, re-work with angular $httpInjector to avoid race conditions,
-    // and unexpected changes to this global value when not used carefully with
-    // nested code
     function injectIntoHttpCommonHeaders(tenant_id) {
       $http.defaults.headers.common['X-Auth-Token'] = get(tenant_id).id;
     }

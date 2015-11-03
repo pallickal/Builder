@@ -40,7 +40,6 @@ angular.module('session', ['token', 'tenantTokens'])
         );
 
         if (min_till_exp <= 0) {
-//          console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
           deferred.reject('sessionFactory:withToken - Warning! Token expired and still held as cookie');
         } else if (sec_since_stored < 7) {
           console.log('sessionFactory:withToken - Skipping refresh. < 7 seconds elapsed.');
@@ -57,7 +56,6 @@ angular.module('session', ['token', 'tenantTokens'])
         }
 
       } else {
-  //      console.log('sessionFactory:withToken - Token never existed or expired');
         deferred.reject('sessionFactory:withToken - Token never existed or expired');
       }
       return deferred.promise;
