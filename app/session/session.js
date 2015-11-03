@@ -1,4 +1,4 @@
-angular.module('session', ['token', 'tenantTokens'])
+angular.module('session', ['token', 'tenantTokens', 'tokensPolling'])
   .factory('sessionFactory', function($q, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
@@ -113,4 +113,7 @@ angular.module('session', ['token', 'tenantTokens'])
       return deferred.promise;
     }
 
+  })
+  .run(function(tokensPollingService) {
+    tokensPollingService.start();
   });
