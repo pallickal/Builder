@@ -4,7 +4,8 @@ angular.module('tenantTokens', ['token'])
       get: get,
       setDirty: setDirty,
       renew: renew,
-      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders
+      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
+      remove: remove
     };
 
     function get(tenant_id) {
@@ -65,5 +66,10 @@ angular.module('tenantTokens', ['token'])
 
     function set(tenant_id, token) {
       $cookies.putObject(tenant_id, token, {expires: token.expires_at});
+    }
+
+    function remove() {
+      // implement after tenant token store is re-implemented to be enumerable
+      console.log('tenantTokensService:delete - Warning! Not implemented');
     }
   });

@@ -5,7 +5,8 @@ angular.module('token', [])
       setDirty: setDirty,
       renew: renew,
       injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
-      persist: persist
+      persist: persist,
+      remove: remove
     };
 
     function get() {
@@ -64,5 +65,9 @@ angular.module('token', [])
         'stored_at': moment().toISOString()
       };
       set(token);
+    }
+
+    function remove() {
+      $cookies.remove('X-Subject-Token');
     }
   });

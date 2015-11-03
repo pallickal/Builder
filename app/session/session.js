@@ -7,7 +7,7 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
     };
 
     function authenticate(userName, password) {
-      return userService.authenticate(userName, password);
+      return userService.signIn(userName, password);
     };
 
     function withToken() {

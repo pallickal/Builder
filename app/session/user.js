@@ -1,10 +1,11 @@
-angular.module('user', ['token'])
-  .service('userService', function($http, $q, $cookies, tokenService) {
+angular.module('user', [])
+  .service('userService', function($http, $q, $cookies, tokenService, tenantTokensService) {
     return {
-      authenticate: authenticate
+      signIn: signIn,
+      signOut: signOut
     };
 
-    function authenticate(userName, password) {
+    function signIn(userName, password) {
       var deferred = $q.defer();
       var requestData = {
                         "auth": {
@@ -25,6 +26,7 @@ angular.module('user', ['token'])
                         }
                       };
 
+      signOut();
       console.log('tokenService:authenticate - requestData:\n' + JSON.stringify(requestData, null, '  '));
 
       $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
@@ -42,7 +44,17 @@ angular.module('user', ['token'])
       return deferred.promise;
     };
 
+    function signOut() {
+      tokenService.remove();
+      tenantTokensService.remove();
+      remove();
+    }
+
     function set(data) {
       $cookies.putObject('User', data, {expires: moment().add(8, 'hours').toISOString()});
+    }
+
+    function remove() {
+      $cookies.remove('User');
     }
   });
