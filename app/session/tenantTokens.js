@@ -3,7 +3,8 @@ angular.module('tenantTokens', ['token'])
     return {
       get: get,
       setDirty: setDirty,
-      renew: renew
+      renew: renew,
+      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders
     };
 
     function get(tenant_id) {
@@ -32,12 +33,13 @@ angular.module('tenantTokens', ['token'])
       };
       console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(requestData, null, '  '));
 
+      tokenService.injectIntoHttpCommonHeaders();
       $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
             persist(tenant_id, response.data);
-            $http.defaults.headers.common['X-Auth-Token'] = response.data.access.token.id;
+            injectIntoHttpCommonHeaders(tenant_id);
             if (deferred) deferred.resolve(response.data.access.token.id);
           },
           function(response) {
@@ -45,6 +47,13 @@ angular.module('tenantTokens', ['token'])
             if (deferred) deferred.reject('tenantTokensService:renew - Could not get tenant scoped token');
           }
         );
+    }
+
+    // ugly hack, re-work with angular $httpInjector to avoid race conditions,
+    // and unexpected changes to this global value when not used carefully with
+    // nested code
+    function injectIntoHttpCommonHeaders(tenant_id) {
+      $http.defaults.headers.common['X-Auth-Token'] = get(tenant_id).id;
     }
 
     function persist(tenant_id, data) {

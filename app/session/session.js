@@ -1,5 +1,5 @@
 angular.module('session', ['token', 'tenantTokens'])
-  .factory('sessionFactory', function($http, $q, tokenService, tenantTokensService) {
+  .factory('sessionFactory', function($q, tokenService, tenantTokensService) {
     return {
       authenticate: authenticate,
       withToken: withToken,
@@ -44,11 +44,11 @@ angular.module('session', ['token', 'tenantTokens'])
           deferred.reject('sessionFactory:withToken - Warning! Token expired and still held as cookie');
         } else if (sec_since_stored < 7) {
           console.log('sessionFactory:withToken - Skipping refresh. < 7 seconds elapsed.');
-          $http.defaults.headers.common['X-Auth-Token'] = token.id;
+          tokenService.injectIntoHttpCommonHeaders();
           deferred.resolve(token.id);
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withToken - Delaying refresh. > 2 minutes till expiration.');
-          $http.defaults.headers.common['X-Auth-Token'] = token.id;
+          tokenService.injectIntoHttpCommonHeaders();
           deferred.resolve(token.id);
           tokenService.setDirty();
         } else {
@@ -92,11 +92,11 @@ angular.module('session', ['token', 'tenantTokens'])
 
         if (min_till_exp > 0 && sec_since_stored < 7) {
           console.log('sessionFactory:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
-          $http.defaults.headers.common['X-Auth-Token'] = token.id;
+          tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
           deferred.resolve(token.id);
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
-          $http.defaults.headers.common['X-Auth-Token'] = token.id;
+          tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
           deferred.resolve(token.id);
           tenantTokensService.setDirty(tenant_id);
         } else {

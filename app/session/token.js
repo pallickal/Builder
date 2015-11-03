@@ -4,7 +4,8 @@ angular.module('token', [])
       init: init,
       get: get,
       setDirty: setDirty,
-      renew: renew
+      renew: renew,
+      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders
     };
 
     function init(userName, password) {
@@ -70,7 +71,7 @@ angular.module('token', [])
         }
       };
 
-      $http.defaults.headers.common['X-Auth-Token'] = token.id;
+      injectIntoHttpCommonHeaders();
       $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
       .then(
         function(response) {
@@ -83,6 +84,13 @@ angular.module('token', [])
           if (deferred) deferred.reject(response);
         }
       );
+    }
+
+    // ugly hack, re-work with angular $httpInjector to avoid race conditions,
+    // and unexpected changes to this global value when not used carefully with
+    // nested code
+    function injectIntoHttpCommonHeaders() {
+      $http.defaults.headers.common['X-Auth-Token'] = get().id;
     }
 
     function set(token) {
