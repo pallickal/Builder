@@ -1,4 +1,4 @@
-angular.module('login', ['session'])
+angular.module('login', [])
   .controller('loginCtrl', function($scope, $window, sessionFactory){
     $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
