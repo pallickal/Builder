@@ -54,13 +54,13 @@ angular.module('token', [])
 
     function setDirty() {
       console.log('tokenService:setDirty - setting token dirty');
-      var token = $cookies.getObject('X-Subject-Token');
+      var token = get();
       token.dirty = true;
-      $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
+      set(token);
     };
 
     function renew(deferred) {
-      var token = $cookies.getObject('X-Subject-Token');
+      var token = get();
 
       var requestData = {
         "auth": {
@@ -85,6 +85,10 @@ angular.module('token', [])
       );
     }
 
+    function set(token) {
+      $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
+    }
+
     function persist(x_subject_token, expires_at) {
       var token = {
         'id': x_subject_token,
@@ -92,10 +96,6 @@ angular.module('token', [])
         'expires_at': expires_at,
         'stored_at': moment().toISOString()
       };
-
-      $cookies.putObject('X-Subject-Token', token, {expires: expires_at});
-      console.log('tokenService:persist - |X-Subject-Token| = ' +
-        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
-      );
+      set(token);
     }
   });

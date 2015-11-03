@@ -16,9 +16,9 @@ angular.module('tenantTokens', ['token'])
 
     function setDirty(tenant_id) {
       console.log('tenantTokensService:setDirty - setting tenant ' + tenant_id + ' token dirty');
-      var token = $cookies.getObject(tenant_id);
+      var token = get(tenant_id);
       token.dirty = true;
-      $cookies.putObject(tenant_id, token, {expires: token.expires_at});
+      set(tenant_id, token);
     };
 
     function renew(subject_token_id, tenant_id, deferred) {
@@ -54,11 +54,10 @@ angular.module('tenantTokens', ['token'])
         'expires_at': data.access.token.expires,
         'stored_at': moment().toISOString()
       };
+      set(tenant_id, token);
+    }
 
-      $cookies.putObject(tenant_id, token, {expires: data.access.token.expires});
-      console.log(
-        'tenantTokensService:persist - |' + tenant_id + '| = ' +
-        JSON.stringify($cookies.getObject(tenant_id), null, '  ')
-      );
+    function set(tenant_id, token) {
+      $cookies.putObject(tenant_id, token, {expires: token.expires_at});
     }
   });

@@ -65,7 +65,7 @@ angular.module('session', ['token', 'tenantTokens'])
 
     function withTenantToken(tenant_id) {
       var deferred = $q.defer();
-      var token = tenantTokensService.get();
+      var token = tenantTokensService.get(tenant_id);
 
       function renew() {
         withToken()
