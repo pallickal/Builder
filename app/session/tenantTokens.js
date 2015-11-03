@@ -17,10 +17,10 @@ angular.module('tenantTokens', ['token'])
     }
 
     function setDirty(tenant_id) {
-      console.log('tenantTokensService:setDirty - setting tenant ' + tenant_id + ' token dirty');
       var token = get(tenant_id);
+      console.log('tenantTokensService:setDirty - setting tenant ' + tenant_id + ' token dirty');
       token.dirty = true;
-      set(tenant_id, token);
+      set(tenant_id, token.id, token.expires_at, token.dirty);
     };
 
     function renew(subject_token_id, tenant_id, deferred) {
@@ -39,7 +39,7 @@ angular.module('tenantTokens', ['token'])
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
-            persist(tenant_id, response.data);
+            set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
             injectIntoHttpCommonHeaders(tenant_id);
             if (deferred) deferred.resolve(response.data.access.token.id);
           },
@@ -54,17 +54,13 @@ angular.module('tenantTokens', ['token'])
       $http.defaults.headers.common['X-Auth-Token'] = get(tenant_id).id;
     }
 
-    function persist(tenant_id, data) {
+    function set(tenant_id, tenant_token, expires_at, dirty) {
       token = {
-        'id': data.access.token.id,
-        'dirty': false,
-        'expires_at': data.access.token.expires,
+        'id': tenant_token,
+        'dirty': (dirty ? true : false),
+        'expires_at': expires_at,
         'stored_at': moment().toISOString()
       };
-      set(tenant_id, token);
-    }
-
-    function set(tenant_id, token) {
       $cookies.putObject(tenant_id, token, {expires: token.expires_at});
     }
 

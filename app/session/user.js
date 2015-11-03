@@ -34,7 +34,7 @@ angular.module('user', [])
           console.log('tokenService:authenticate - Token response header:\n' + JSON.stringify(response.headers(), null, '  '));
           console.log('tokenService:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));
 
-          tokenService.persist(response.headers('X-Subject-Token'), response.data.token.expires_at);
+          tokenService.set(response.headers('X-Subject-Token'), response.data.token.expires_at);
           set(response.data.token.user);
           tokenService.injectIntoHttpCommonHeaders();
           deferred.resolve();

@@ -5,7 +5,7 @@ angular.module('token', [])
       setDirty: setDirty,
       renew: renew,
       injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
-      persist: persist,
+      set: set,
       remove: remove
     };
 
@@ -18,10 +18,10 @@ angular.module('token', [])
     }
 
     function setDirty() {
-      console.log('tokenService:setDirty - setting token dirty');
       var token = get();
+      console.log('tokenService:setDirty - setting token dirty');
       token.dirty = true;
-      set(token);
+      set(token.id, token.expires_at, token.dirty);
     };
 
     function renew(deferred) {
@@ -40,7 +40,7 @@ angular.module('token', [])
       .then(
         function(response) {
           console.log('tokenService:renew:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
-          persist(response.data.access.token.id, response.data.access.token.expires);
+          set(response.data.access.token.id, response.data.access.token.expires);
           if (deferred) deferred.resolve(response.data.access.token.id);
         },
         function(response) {
@@ -53,18 +53,14 @@ angular.module('token', [])
       $http.defaults.headers.common['X-Auth-Token'] = get().id;
     }
 
-    function set(token) {
-      $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
-    }
-
-    function persist(x_subject_token, expires_at) {
+    function set(x_subject_token, expires_at, dirty) {
       var token = {
         'id': x_subject_token,
-        'dirty': false,
+        'dirty': (dirty ? true : false),
         'expires_at': expires_at,
         'stored_at': moment().toISOString()
       };
-      set(token);
+      $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
     }
 
     function remove() {
