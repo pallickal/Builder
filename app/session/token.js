@@ -40,7 +40,7 @@ angular.module('token', [])
           $http.defaults.headers.common['X-Auth-Token'] = response.headers('X-Subject-Token');
           deferred.resolve();
         }, function(err_response) {
-          deferred.reject('tokenService:get - HTTP failure response:' + JSON.stringify(err_response, null, '  '))
+          deferred.reject('tokenService:get - HTTP failure response:\n' + JSON.stringify(err_response, null, '  '))
         });
       return deferred.promise;
     }
@@ -80,8 +80,7 @@ angular.module('token', [])
           if (deferred) deferred.resolve(response.data.access.token.id);
         },
         function(response) {
-          console.log('tokenService:renew:postError - Response:\n' + response);
-          if (deferred) deferred.reject(response);
+          if (deferred) deferred.reject('tokenService:renew - Error retrieving subject token');
         }
       );
     }

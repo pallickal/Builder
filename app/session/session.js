@@ -40,7 +40,7 @@ angular.module('session', ['token', 'tenantTokens'])
         );
 
         if (min_till_exp <= 0) {
-          console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
+//          console.log('sessionFactory:withToken - Warning! Token expired and still held as cookie');
           deferred.reject('sessionFactory:withToken - Warning! Token expired and still held as cookie');
         } else if (sec_since_stored < 7) {
           console.log('sessionFactory:withToken - Skipping refresh. < 7 seconds elapsed.');
@@ -57,7 +57,7 @@ angular.module('session', ['token', 'tenantTokens'])
         }
 
       } else {
-        console.log('sessionFactory:withToken - Token never existed or expired');
+  //      console.log('sessionFactory:withToken - Token never existed or expired');
         deferred.reject('sessionFactory:withToken - Token never existed or expired');
       }
       return deferred.promise;
@@ -72,7 +72,7 @@ angular.module('session', ['token', 'tenantTokens'])
           .then(function(token_id) {
             tenantTokensService.renew(token_id, tenant_id, deferred);
           }, function(error) {
-            console.log('sessionFactory:withTenantToken:refreshTenantToken - Rejected promise from withToken, error:\n' + error)
+            error = error + '\nsessionFactory:withTenantToken:renew - Rejected promise from withToken';
             deferred.reject(error);
           });
       }

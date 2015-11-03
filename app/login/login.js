@@ -7,7 +7,7 @@ angular.module('login', ['session'])
         .then(function() {
           $window.location.href = '#/tenants';
         }, function(error) {
-          console.log('loginCtrl: - Error from sessionFactory:authenticate:' + error);
+          console.log(error + '\nloginCtrl: - Error authenticating');
         });
     };
   });

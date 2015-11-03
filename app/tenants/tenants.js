@@ -17,22 +17,22 @@ angular.module('tenants', [])
               deferred.reject(err_response);
             });
         }, function(error) {
-          console.log('tenantsFactory:list - Error from withToken =\n', error);
-          $window.location.href = '#/login';
+          deferred.reject(error + '\ntenantsFactory:list - Error getting subject token');
         });
       return deferred.promise;
     };
   })
-  .controller('tenantsCtrl', function($scope, $http, $cookies, tenantsFactory){
+  .controller('tenantsCtrl', function($scope, $http, $window, tenantsFactory){
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
 
     tenantsFactory.list()
       .then(function(data) {
-        console.log('tenantsCtrl Response:\n' + JSON.stringify(data, null, '  '));
+        console.log('tenantsCtrl - Tenant list response:\n' + JSON.stringify(data, null, '  '));
         $scope.tenants = data;
       }, function(error) {
-        console.log('tenantsCtrl Error response:\n' + JSON.stringify(error, null, '  '));
+        console.log(error + '\ntenantsCtrl - Error getting tenant list');
+        $window.location.href = '#/login';
       });
   });

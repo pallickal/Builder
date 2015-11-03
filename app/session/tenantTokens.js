@@ -44,7 +44,7 @@ angular.module('tenantTokens', ['token'])
           },
           function(response) {
             console.log('tenantTokensService:renew - Could not get tenant scoped token');
-            if (deferred) deferred.reject('tenantTokensService:renew - Could not get tenant scoped token');
+            if (deferred) deferred.reject('tenantTokensService:renew - Could not get tenant token for id ' + tenant_id);
           }
         );
     }
