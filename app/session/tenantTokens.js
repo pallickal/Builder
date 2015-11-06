@@ -9,11 +9,13 @@ angular.module('tenantTokens', ['token'])
     };
 
     function get(tenant_id) {
+      var tenant_tokens = $cookies.getObject('Tenant-Tokens');
+      var requested_token = (tenant_tokens ? tenant_tokens[tenant_id] : tenant_tokens);
       console.log(
-        'tenantTokensService:get - |' + tenant_id + '| = ' +
-        JSON.stringify($cookies.getObject(tenant_id), null, '  ')
+        'tenantTokensService:get - |Tenant-Tokens|["' + tenant_id + '"] = ' +
+        JSON.stringify(requested_token, null, '  ')
       );
-      return $cookies.getObject(tenant_id);
+      return requested_token;
     }
 
     function setDirty(tenant_id) {
@@ -54,18 +56,28 @@ angular.module('tenantTokens', ['token'])
       $http.defaults.headers.common['X-Auth-Token'] = get(tenant_id).id;
     }
 
+    function remove() {
+      $cookies.remove('Tenant-Tokens');
+      console.log(
+        "tenantTokenService:remove - Tenant tokens removed. |Tenant-Tokens| = " +
+        JSON.stringify($cookies.getObject('Tenant-Tokens'), null, '  ')
+      );
+    }
+
     function set(tenant_id, tenant_token, expires_at, dirty) {
+      tenant_tokens = $cookies.getObject('Tenant-Tokens') || {};
       token = {
         'id': tenant_token,
         'dirty': (dirty ? true : false),
         'expires_at': expires_at,
         'stored_at': moment().toISOString()
       };
-      $cookies.putObject(tenant_id, token, {expires: token.expires_at});
-    }
-
-    function remove() {
-      // implement after tenant token store is re-implemented to be enumerable
-      console.log('tenantTokensService:delete - Warning! Not implemented');
+      tenant_tokens[tenant_id] = token;
+      $cookies.putObject('Tenant-Tokens', tenant_tokens, {expires: token.expires_at});
+      console.log(
+        "tenantTokenService:set - Added tenant_id " + tenant_id +
+        "\n|Tenant-Tokens| = " +
+        JSON.stringify($cookies.getObject('Tenant-Tokens'), null, '  ')
+      );
     }
   });

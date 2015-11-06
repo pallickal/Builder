@@ -61,9 +61,17 @@ angular.module('token', [])
         'stored_at': moment().toISOString()
       };
       $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
+      console.log(
+        "tokenService:set - |X-Subject-Token| = " +
+        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
+      );
     }
 
     function remove() {
       $cookies.remove('X-Subject-Token');
+      console.log(
+        "tokenService:remove - Subject token removed. |X-Subject-Token| = " +
+        JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')
+      );
     }
   });
