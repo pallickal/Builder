@@ -52,7 +52,13 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
           tokenService.setDirty();
         } else {
           console.log('sessionFactory:withToken - < 2 minutes till expiration. Refresh first.');
-          tokenService.renew(deferred);
+          tokenService.renew(deferred)
+            .then(function(token_id) {
+              deferred.resolve(token_id);
+            }, function(error) {
+              error = error + '\nsessionFactory:withToken - Rejected promise from tokenService.renew';
+              deferred.reject(error);
+            });
         }
 
       } else {
@@ -68,7 +74,13 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
       function renew() {
         withToken()
           .then(function(token_id) {
-            tenantTokensService.renew(token_id, tenant_id, deferred);
+            tenantTokensService.renew(token_id, tenant_id, deferred)
+              .then(function(tenant_token_id) {
+                deferred.resolve(tenant_token_id);
+              }, function(error) {
+                error = error + '\nsessionFactory:withTenantToken:renew - Rejected promise from tenantTokenService.renew';
+                deferred.reject(error);
+              });
           }, function(error) {
             error = error + '\nsessionFactory:withTenantToken:renew - Rejected promise from withToken';
             deferred.reject(error);
