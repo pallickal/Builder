@@ -30,4 +30,7 @@ angular.module('tokensPolling', ['token'])
           });
       }
     };
+  })
+  .run(function(tokensPollingService) {
+    tokensPollingService.start();
   });

@@ -106,7 +106,4 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
       }
     }
 
-  })
-  .run(function(tokensPollingService) {
-    tokensPollingService.start();
   });
