@@ -43,7 +43,7 @@ angular.module('tenantTokens', ['token'])
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
             set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
             injectIntoHttpCommonHeaders(tenant_id);
-            return response.data.access.token.id;
+            return get();
           },
           function(response) {
             return $q.reject(new Error('Error getting tenant token for id ' + tenant_id));

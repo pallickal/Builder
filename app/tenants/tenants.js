@@ -6,7 +6,7 @@ angular.module('tenants', [])
 
     function list() {
       return sessionService.withToken()
-        .then(function(token_id) {
+        .then(function(token) {
           return $http.get('http://192.168.122.183:5000/v2.0/tenants')
             .then(function(response){
               console.log('tenantsService:list common $http headers in tenantsService: \n', $http.defaults.headers.common)

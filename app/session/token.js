@@ -41,7 +41,7 @@ angular.module('token', [])
         function(response) {
           console.log('tokenService:renew:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
           set(response.data.access.token.id, response.data.access.token.expires);
-          return response.data.access.token.id;
+          return get();
         },
         function(response) {
           return $q.reject(new Error('Error retrieving subject token'));
