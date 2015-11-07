@@ -1,16 +1,16 @@
 angular.module('tenants', [])
-  .factory('tenantsFactory', function($http, $q, $window, sessionFactory) {
+  .service('tenantsService', function($http, $q, $window, sessionService) {
     return {
       list: list
     };
 
     function list() {
-      return sessionFactory.withToken()
+      return sessionService.withToken()
         .then(function(token_id) {
           return $http.get('http://192.168.122.183:5000/v2.0/tenants')
             .then(function(response){
-              console.log('tenantsFactory:list common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
-              console.log('tenantsFactory:list Response:\n' + JSON.stringify(response, null, '  '));
+              console.log('tenantsService:list common $http headers in tenantsService: \n', $http.defaults.headers.common)
+              console.log('tenantsService:list Response:\n' + JSON.stringify(response, null, '  '));
               return response.data;
             }, function(response) {
               return $q.reject(new Error('Could not get tenant list'));
@@ -18,12 +18,12 @@ angular.module('tenants', [])
         });
     };
   })
-  .controller('tenantsCtrl', function($scope, $http, $window, tenantsFactory){
+  .controller('tenantsCtrl', function($scope, $http, $window, tenantsService){
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
 
-    tenantsFactory.list()
+    tenantsService.list()
       .then(function(data) {
         console.log('tenantsCtrl - Tenant list response:\n' + JSON.stringify(data, null, '  '));
         $scope.tenants = data;
