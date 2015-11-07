@@ -36,12 +36,12 @@ angular.module('token', [])
       };
 
       injectIntoHttpCommonHeaders();
-      $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+      return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
       .then(
         function(response) {
           console.log('tokenService:renew:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
           set(response.data.access.token.id, response.data.access.token.expires);
-          return $q.resolve(response.data.access.token.id);
+          return response.data.access.token.id;
         },
         function(response) {
           return $q.reject(new Error('Error retrieving subject token'));

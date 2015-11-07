@@ -37,16 +37,16 @@ angular.module('tenantTokens', ['token'])
       console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(requestData, null, '  '));
 
       tokenService.injectIntoHttpCommonHeaders();
-      $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+      return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
             set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
             injectIntoHttpCommonHeaders(tenant_id);
-            $q.resolve(response.data.access.token.id);
+            return response.data.access.token.id;
           },
           function(response) {
-            $q.reject(new Error('Error getting tenant token for id ' + tenant_id));
+            return $q.reject(new Error('Error getting tenant token for id ' + tenant_id));
           }
         );
     }
