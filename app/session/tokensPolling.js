@@ -1,5 +1,5 @@
-angular.module('tokensPolling', ['token'])
-  .service('tokensPollingService', function($interval, $q, $http, tokenService) {
+angular.module('tokensPolling', ['token', 'tenantTokens'])
+  .service('tokensPollingService', function($interval, $q, $http, tokenService, tenantTokensService) {
     return {
       start: start,
       stop: stop
@@ -29,6 +29,7 @@ angular.module('tokensPolling', ['token'])
             console.log(error.stack);
           });
       }
+      tenantTokensService.renewDirty();
     };
   })
   .run(function(tokensPollingService) {

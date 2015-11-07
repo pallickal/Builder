@@ -3,6 +3,7 @@ angular.module('tenantTokens', ['token'])
     return {
       get: get,
       setDirty: setDirty,
+      renewDirty: renewDirty,
       renew: renew,
       injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
       remove: remove
@@ -24,6 +25,17 @@ angular.module('tenantTokens', ['token'])
       token.dirty = true;
       set(tenant_id, token.id, token.expires_at, token.dirty);
     };
+
+    function renewDirty() {
+      var tokens = $cookies.getObject('Tenant-Tokens');
+
+      for (tenant_id in tokens) {
+        if (tokens[tenant_id].dirty) {
+          console.log('tenantTokensService:renewDirty - renewing token for tenant_id ' + tenant_id);
+          renew(tokenService.get().id, tenant_id);
+        }
+      }
+    }
 
     function renew(subject_token_id, tenant_id) {
       var requestData = {
