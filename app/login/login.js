@@ -1,9 +1,9 @@
-angular.module('login', [])
-  .controller('loginCtrl', function($scope, $window, sessionService){
+angular.module('login', ['user'])
+  .controller('loginCtrl', function($scope, $window, userService){
     $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
     $scope.processFunction = function() {
-      sessionService.authenticate($scope.formData.userName, $scope.formData.password)
+      userService.signIn($scope.formData.userName, $scope.formData.password)
         .then(function() {
           $window.location.href = '#/tenants';
         }, function(error) {

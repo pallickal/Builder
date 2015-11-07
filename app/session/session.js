@@ -1,13 +1,8 @@
 angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
   .service('sessionService', function($q, userService, tokenService, tenantTokensService) {
     return {
-      authenticate: authenticate,
       withToken: withToken,
       withTenantToken: withTenantToken
-    };
-
-    function authenticate(userName, password) {
-      return userService.signIn(userName, password);
     };
 
     function withToken() {
