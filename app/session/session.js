@@ -59,51 +59,49 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
     }
 
     function withTenantToken(tenant_id) {
-      var token = tenantTokensService.get(tenant_id);
+      return withToken()
+        .then(function(subject_token) {
+          var token = tenantTokensService.get(tenant_id);
 
-      function renew() {
-        return withToken()
-          .then(
-            function(subject_token) { return tenantTokensService.renew(subject_token.id, tenant_id); },
-            function(error) { return $q.reject(error); }
-          );
-      }
-
-      if (token) {
-        var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
-        var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
-
-        console.log(
-          'sessionService:withTenantToken - expires_at minutes from current date/time = ' +
-          min_till_exp
-        );
-        console.log(
-          'sessionService:withTenantToken - min_till_exp seconds from current date/time = ' +
-          sec_since_stored
-        );
-
-        if (min_till_exp > 0 && sec_since_stored < 7) {
-          console.log('sessionService:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
-          tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
-          return $q.resolve(token);
-        } else if (min_till_exp > 2) {
-          console.log('sessionService:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
-          tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
-          tenantTokensService.setDirty(tenant_id);
-          return $q.resolve(token);
-        } else {
-          if (min_till_exp <= 0) {
-            console.log('sessionService:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
-          } else {
-            console.log('sessionService:withTenantToken - < 2 minutes till expiration, refresh first.');
+          function renew() {
+            return tenantTokensService.renew(subject_token.id, tenant_id);
           }
-          return renew();
-        }
 
-      } else {
-        console.log('sessionService:withTenantToken - Token never existed or expired');
-        return renew();
+          if (token) {
+            var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
+            var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
+
+            console.log(
+              'sessionService:withTenantToken - expires_at minutes from current date/time = ' +
+              min_till_exp
+            );
+            console.log(
+              'sessionService:withTenantToken - min_till_exp seconds from current date/time = ' +
+              sec_since_stored
+            );
+
+            if (min_till_exp > 0 && sec_since_stored < 7) {
+              console.log('sessionService:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
+              tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
+              return $q.resolve(token);
+            } else if (min_till_exp > 2) {
+              console.log('sessionService:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
+              tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
+              tenantTokensService.setDirty(tenant_id);
+              return $q.resolve(token);
+            } else {
+              if (min_till_exp <= 0) {
+                console.log('sessionService:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
+              } else {
+                console.log('sessionService:withTenantToken - < 2 minutes till expiration, refresh first.');
+              }
+              return renew();
+            }
+
+          } else {
+            console.log('sessionService:withTenantToken - Token never existed or expired');
+            return renew();
+          }
+        });
       }
-    }
-
   });
