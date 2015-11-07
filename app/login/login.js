@@ -7,7 +7,7 @@ angular.module('login', [])
         .then(function() {
           $window.location.href = '#/tenants';
         }, function(error) {
-          console.log(error + '\nloginCtrl: - Error authenticating');
+          console.log(error.stack);
         });
     };
   });

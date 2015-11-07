@@ -11,9 +11,7 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
     };
 
     function withToken() {
-      var deferred = $q.defer();
       var token = tokenService.get();
-
       if (token) {
         var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
         var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
@@ -40,51 +38,35 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
         );
 
         if (min_till_exp <= 0) {
-          deferred.reject('sessionFactory:withToken - Warning! Token expired and still held as cookie');
+          return $q.reject('sessionFactory:withToken - Warning! Token expired and still held as cookie');
         } else if (sec_since_stored < 7) {
           console.log('sessionFactory:withToken - Skipping refresh. < 7 seconds elapsed.');
           tokenService.injectIntoHttpCommonHeaders();
-          deferred.resolve(token.id);
+          return $q.resolve(token.id);
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withToken - Delaying refresh. > 2 minutes till expiration.');
           tokenService.injectIntoHttpCommonHeaders();
-          deferred.resolve(token.id);
+          return $q.resolve(token.id);
           tokenService.setDirty();
         } else {
           console.log('sessionFactory:withToken - < 2 minutes till expiration. Refresh first.');
-          tokenService.renew(deferred)
-            .then(function(token_id) {
-              deferred.resolve(token_id);
-            }, function(error) {
-              error = error + '\nsessionFactory:withToken - Rejected promise from tokenService.renew';
-              deferred.reject(error);
-            });
+          return tokenService.renew();
         }
 
       } else {
-        deferred.reject('sessionFactory:withToken - Token never existed or expired');
+        return $q.reject(new Error('Token never existed or expired'));
       }
-      return deferred.promise;
     }
 
     function withTenantToken(tenant_id) {
-      var deferred = $q.defer();
       var token = tenantTokensService.get(tenant_id);
 
       function renew() {
-        withToken()
-          .then(function(token_id) {
-            tenantTokensService.renew(token_id, tenant_id, deferred)
-              .then(function(tenant_token_id) {
-                deferred.resolve(tenant_token_id);
-              }, function(error) {
-                error = error + '\nsessionFactory:withTenantToken:renew - Rejected promise from tenantTokenService.renew';
-                deferred.reject(error);
-              });
-          }, function(error) {
-            error = error + '\nsessionFactory:withTenantToken:renew - Rejected promise from withToken';
-            deferred.reject(error);
-          });
+        return withToken()
+          .then(
+            function(token_id) { return tenantTokensService.renew(token_id, tenant_id); },
+            function(error) { return $q.reject(error); }
+          );
       }
 
       if (token) {
@@ -103,11 +85,11 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
         if (min_till_exp > 0 && sec_since_stored < 7) {
           console.log('sessionFactory:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
           tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
-          deferred.resolve(token.id);
+          return $q.resolve(token.id);
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
           tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
-          deferred.resolve(token.id);
+          return $q.resolve(token.id);
           tenantTokensService.setDirty(tenant_id);
         } else {
           if (min_till_exp <= 0) {
@@ -115,14 +97,13 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
           } else {
             console.log('sessionFactory:withTenantToken - < 2 minutes till expiration, refresh first.');
           }
-          renew();
+          return renew();
         }
 
       } else {
         console.log('sessionFactory:withTenantToken - Token never existed or expired');
-        renew();
+        return renew();
       }
-      return deferred.promise;
     }
 
   })

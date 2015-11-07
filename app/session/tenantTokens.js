@@ -26,7 +26,6 @@ angular.module('tenantTokens', ['token'])
     };
 
     function renew(subject_token_id, tenant_id) {
-      var deferred = $q.defer();
       var requestData = {
         "auth": {
           "token": {
@@ -44,14 +43,12 @@ angular.module('tenantTokens', ['token'])
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
             set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
             injectIntoHttpCommonHeaders(tenant_id);
-            deferred.resolve(response.data.access.token.id);
+            $q.resolve(response.data.access.token.id);
           },
           function(response) {
-            console.log('tenantTokensService:renew - Could not get tenant scoped token');
-            deferred.reject('tenantTokensService:renew - Could not get tenant token for id ' + tenant_id);
+            $q.reject(new Error('Error getting tenant token for id ' + tenant_id));
           }
         );
-      return deferred.promise;
     }
 
     function injectIntoHttpCommonHeaders(tenant_id) {

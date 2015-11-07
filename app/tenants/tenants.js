@@ -5,21 +5,17 @@ angular.module('tenants', [])
     };
 
     function list() {
-      var deferred = $q.defer();
-      sessionFactory.withToken()
+      return sessionFactory.withToken()
         .then(function(token_id) {
-          $http.get('http://192.168.122.183:5000/v2.0/tenants')
+          return $http.get('http://192.168.122.183:5000/v2.0/tenants')
             .then(function(response){
               console.log('tenantsFactory:list common $http headers in tenantsFactory: \n', $http.defaults.headers.common)
               console.log('tenantsFactory:list Response:\n' + JSON.stringify(response, null, '  '));
-              deferred.resolve(response.data);
-            }, function(err_response) {
-              deferred.reject(err_response);
+              return response.data;
+            }, function(response) {
+              return $q.reject(new Error('Could not get tenant list'));
             });
-        }, function(error) {
-          deferred.reject(error + '\ntenantsFactory:list - Error getting subject token');
         });
-      return deferred.promise;
     };
   })
   .controller('tenantsCtrl', function($scope, $http, $window, tenantsFactory){
@@ -32,7 +28,7 @@ angular.module('tenants', [])
         console.log('tenantsCtrl - Tenant list response:\n' + JSON.stringify(data, null, '  '));
         $scope.tenants = data;
       }, function(error) {
-        console.log(error + '\ntenantsCtrl - Error getting tenant list');
+        console.log(error.stack);
         $window.location.href = '#/login';
       });
   });

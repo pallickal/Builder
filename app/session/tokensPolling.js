@@ -26,8 +26,7 @@ angular.module('tokensPolling', ['token'])
         console.log('tokensPollingService:refreshDirtyTokens - token is dirty');
         tokenService.renew()
           .catch(function(error) {
-            error = error + '\ntokensPollingService:refreshDirtyTokens - Rejected promise from tokenService.renew';
-            console.log(error);
+            console.log(error.stack);
           });
       }
     };

@@ -25,7 +25,6 @@ angular.module('token', [])
     };
 
     function renew() {
-      var deferred = $q.defer();
       var token = get();
 
       var requestData = {
@@ -42,13 +41,12 @@ angular.module('token', [])
         function(response) {
           console.log('tokenService:renew:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));
           set(response.data.access.token.id, response.data.access.token.expires);
-          deferred.resolve(response.data.access.token.id);
+          return $q.resolve(response.data.access.token.id);
         },
         function(response) {
-          deferred.reject('tokenService:renew - Error retrieving subject token');
+          return $q.reject(new Error('Error retrieving subject token'));
         }
       );
-      return deferred.promise;
     }
 
     function injectIntoHttpCommonHeaders() {
