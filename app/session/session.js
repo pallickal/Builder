@@ -46,8 +46,8 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withToken - Delaying refresh. > 2 minutes till expiration.');
           tokenService.injectIntoHttpCommonHeaders();
-          return $q.resolve(token.id);
           tokenService.setDirty();
+          return $q.resolve(token.id);
         } else {
           console.log('sessionFactory:withToken - < 2 minutes till expiration. Refresh first.');
           return tokenService.renew();
@@ -89,8 +89,8 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
         } else if (min_till_exp > 2) {
           console.log('sessionFactory:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
           tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
-          return $q.resolve(token.id);
           tenantTokensService.setDirty(tenant_id);
+          return $q.resolve(token.id);
         } else {
           if (min_till_exp <= 0) {
             console.log('sessionFactory:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
