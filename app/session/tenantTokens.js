@@ -31,8 +31,11 @@ angular.module('tenantTokens', ['token'])
 
       for (tenant_id in tokens) {
         if (tokens[tenant_id].dirty) {
-          console.log('tenantTokensService:renewDirty - renewing token for tenant_id ' + tenant_id);
-          renew(tokenService.get().id, tenant_id);
+          console.log('tenantTokensService:renewDirty - token for tenant_id ' + tenant_id + ' is dirty');
+          renew(tokenService.get().id, tenant_id)
+            .catch(function(error) {
+              console.log(error.stack);
+            });
         }
       }
     }
