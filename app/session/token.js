@@ -3,6 +3,7 @@ angular.module('token', [])
     return {
       get: get,
       setDirty: setDirty,
+      renewDirty: renewDirty,
       renew: renew,
       injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
       set: set,
@@ -23,6 +24,17 @@ angular.module('token', [])
       token.dirty = true;
       set(token.id, token.expires_at, token.dirty);
     };
+
+    function renewDirty() {
+      var token = get();
+      if (token && token.dirty) {
+        console.log('tokenService:renewDirty - subject token is dirty');
+        renew()
+          .catch(function(error) {
+            console.log(error.stack);
+          });
+      }
+    }
 
     function renew() {
       var token = get();

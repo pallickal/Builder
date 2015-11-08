@@ -20,15 +20,7 @@ angular.module('tokensPolling', ['token', 'tenantTokens'])
     };
 
     function refreshDirtyToken() {
-      console.log('tokensPollingService:refreshDirtyTokens');
-      var token = tokenService.get();
-      if (token && token.dirty) {
-        console.log('tokensPollingService:refreshDirtyTokens - token is dirty');
-        tokenService.renew()
-          .catch(function(error) {
-            console.log(error.stack);
-          });
-      }
+      tokenService.renewDirty();
       tenantTokensService.renewDirty();
     };
   })
