@@ -6,7 +6,7 @@ angular.module('user', [])
     };
 
     function signIn(userName, password) {
-      var requestData = {
+      var data = {
                         "auth": {
                           "identity": {
                             "methods": [
@@ -25,10 +25,10 @@ angular.module('user', [])
                         }
                       };
 
-      console.log('tokenService:authenticate - requestData:\n' + JSON.stringify(requestData, null, '  '));
+      console.log('tokenService:authenticate - data:\n' + JSON.stringify(data, null, '  '));
       signOut();
 
-      return $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
+      return $http.post('http://192.168.122.183:35357/v3/auth/tokens', data)
         .then(function(response) {
           console.log('tokenService:authenticate - Token response header:\n' + JSON.stringify(response.headers(), null, '  '));
           console.log('tokenService:authenticate - Token response:\n' + JSON.stringify(response, null, '  '));

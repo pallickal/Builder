@@ -38,7 +38,7 @@ angular.module('token', [])
     function renew() {
       var token = get();
 
-      var requestData = {
+      var data = {
         "auth": {
           "token": {
             "id": token.id
@@ -46,7 +46,7 @@ angular.module('token', [])
         }
       };
 
-      return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+      return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
       .then(
         function(response) {
           console.log('tokenService:renew:postSuccess - Response:\n' + JSON.stringify(response, null, '  '));

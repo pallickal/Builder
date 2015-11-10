@@ -40,7 +40,7 @@ angular.module('tenantTokens', ['token'])
     }
 
     function renew(subject_token_id, tenant_id) {
-      var requestData = {
+      var data = {
         "auth": {
           "token": {
             "id": subject_token_id
@@ -48,9 +48,9 @@ angular.module('tenantTokens', ['token'])
           "tenantId": tenant_id
         }
       };
-      console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(requestData, null, '  '));
+      console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(data, null, '  '));
 
-      return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
+      return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
