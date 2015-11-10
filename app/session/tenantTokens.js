@@ -10,11 +10,14 @@ angular.module('tenantTokens', ['token'])
 
     function get(tenantId) {
       var tenantTokens = $cookies.getObject('Tenant-Tokens');
-      var requestedToken = (tenantTokens ? tenantTokens[tenantId] : tenantTokens);
+      var requestedToken;
+
+      if (tenantTokens) requestedToken = tenantTokens[tenantId];
       console.log(
         'tenantTokensService:get - |Tenant-Tokens|["' + tenantId + '"] = ' +
         JSON.stringify(requestedToken, null, '  ')
       );
+
       return requestedToken;
     }
 
