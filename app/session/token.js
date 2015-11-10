@@ -21,7 +21,7 @@ angular.module('token', [])
       var token = get();
       console.log('tokenService:setDirty - setting token dirty');
       token.dirty = true;
-      set(token.id, token.expires_at, token.dirty);
+      set(token.id, token.expiresAt, token.dirty);
     };
 
     function renewDirty() {
@@ -59,14 +59,14 @@ angular.module('token', [])
       );
     }
 
-    function set(x_subject_token, expires_at, dirty) {
+    function set(subjectTokenId, expiresAt, dirty) {
       var token = {
-        'id': x_subject_token,
+        'id': subjectTokenId,
         'dirty': (dirty ? true : false),
-        'expires_at': expires_at,
-        'stored_at': moment().toISOString()
+        'expiresAt': expiresAt,
+        'storedAt': moment().toISOString()
       };
-      $cookies.putObject('X-Subject-Token', token, {expires: token.expires_at});
+      $cookies.putObject('X-Subject-Token', token, {expires: token.expiresAt});
       console.log(
         "tokenService:set - |X-Subject-Token| = " +
         JSON.stringify($cookies.getObject('X-Subject-Token'), null, '  ')

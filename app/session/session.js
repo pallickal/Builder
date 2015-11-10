@@ -8,36 +8,36 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
     function withSubjectToken() {
       var token = tokenService.get();
       if (token) {
-        var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
-        var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
+        var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
+        var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
 
         console.log(
           'sessionService:withSubjectToken - current date/time = ' +
           moment().toISOString()
         );
         console.log(
-          'sessionService:withSubjectToken - expires_at = ' +
-          moment(token.expires_at).toISOString()
+          'sessionService:withSubjectToken - expiresAt = ' +
+          moment(token.expiresAt).toISOString()
         );
         console.log(
           'sessionService:withSubjectToken - expires_at minutes from current date/time = ' +
-          min_till_exp
+          minTillExpiration
         );
         console.log(
-          'sessionService:withSubjectToken - stored_at = ' +
-          moment(token.stored_at).toISOString()
+          'sessionService:withSubjectToken - storedAt = ' +
+          moment(token.storedAt).toISOString()
         );
         console.log(
-          'sessionService:withSubjectToken - stored_at seconds from current date/time = ' +
-          sec_since_stored
+          'sessionService:withSubjectToken - storedAt seconds from current date/time = ' +
+          secSinceStored
         );
 
-        if (min_till_exp <= 0) {
+        if (minTillExpiration <= 0) {
           return $q.reject('sessionService:withSubjectToken - Warning! Token expired and still held as cookie');
-        } else if (sec_since_stored < 7) {
+        } else if (secSinceStored < 7) {
           console.log('sessionService:withSubjectToken - Skipping refresh. < 7 seconds elapsed.');
           return $q.resolve(token);
-        } else if (min_till_exp > 2) {
+        } else if (minTillExpiration > 2) {
           console.log('sessionService:withSubjectToken - Delaying refresh. > 2 minutes till expiration.');
           tokenService.setDirty();
           return $q.resolve(token);
@@ -53,41 +53,41 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
 
     function withTenantToken(tenantId) {
       return withSubjectToken()
-        .then(function(subject_token) {
+        .then(function(subjectToken) {
           var token = tenantTokensService.get(tenantId);
 
           if (token) {
-            var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
-            var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
+            var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
+            var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
 
             console.log(
               'sessionService:withTenantToken - expires_at minutes from current date/time = ' +
-              min_till_exp
+              minTillExpiration
             );
             console.log(
-              'sessionService:withTenantToken - min_till_exp seconds from current date/time = ' +
-              sec_since_stored
+              'sessionService:withTenantToken - minTillExpiration seconds from current date/time = ' +
+              secSinceStored
             );
 
-            if (min_till_exp > 0 && sec_since_stored < 7) {
+            if (minTillExpiration > 0 && secSinceStored < 7) {
               console.log('sessionService:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
               return $q.resolve(token);
-            } else if (min_till_exp > 2) {
+            } else if (minTillExpiration > 2) {
               console.log('sessionService:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
               tenantTokensService.setDirty(tenantId);
               return $q.resolve(token);
             } else {
-              if (min_till_exp <= 0) {
+              if (minTillExpiration <= 0) {
                 console.log('sessionService:withTenantToken - Warning! Tenant scoped token expired and still held as cookie');
               } else {
                 console.log('sessionService:withTenantToken - < 2 minutes till expiration, refresh first.');
               }
-              return tenantTokensService.renew(subject_token.id, tenantId);
+              return tenantTokensService.renew(subjectToken.id, tenantId);
             }
 
           } else {
             console.log('sessionService:withTenantToken - Token never existed or expired');
-            return tenantTokensService.renew(subject_token.id, tenantId);
+            return tenantTokensService.renew(subjectToken.id, tenantId);
           }
         });
     }

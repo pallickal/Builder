@@ -1,8 +1,8 @@
 angular.module('session')
 .service('sessionInterceptor', function($injector, $q, $urlMatcherFactory) {
   var routes = [
-    { url: 'http://192.168.122.183:5000/v2.0/tenants', token_type: 'subject' },
-    { url: 'http://192.168.122.183:8774/v2.1/:tenantId/servers', token_type: 'tenant' }
+    { url: 'http://192.168.122.183:5000/v2.0/tenants', tokenType: 'subject' },
+    { url: 'http://192.168.122.183:8774/v2.1/:tenantId/servers', tokenType: 'tenant' }
   ];
 
   return { request: request };
@@ -30,7 +30,7 @@ angular.module('session')
       var match = route.urlMatcher.exec(url);
       if (match) {
         var sessionService = $injector.get('sessionService');
-        switch (route.token_type) {
+        switch (route.tokenType) {
           case 'subject':
             return sessionService.withSubjectToken();
             break;

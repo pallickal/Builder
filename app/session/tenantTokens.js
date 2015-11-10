@@ -9,20 +9,20 @@ angular.module('tenantTokens', ['token'])
     };
 
     function get(tenantId) {
-      var tenant_tokens = $cookies.getObject('Tenant-Tokens');
-      var requested_token = (tenant_tokens ? tenant_tokens[tenantId] : tenant_tokens);
+      var tenantTokens = $cookies.getObject('Tenant-Tokens');
+      var requestedToken = (tenantTokens ? tenantTokens[tenantId] : tenantTokens);
       console.log(
         'tenantTokensService:get - |Tenant-Tokens|["' + tenantId + '"] = ' +
-        JSON.stringify(requested_token, null, '  ')
+        JSON.stringify(requestedToken, null, '  ')
       );
-      return requested_token;
+      return requestedToken;
     }
 
     function setDirty(tenantId) {
       var token = get(tenantId);
       console.log('tenantTokensService:setDirty - setting tenant ' + tenantId + ' token dirty');
       token.dirty = true;
-      set(tenantId, token.id, token.expires_at, token.dirty);
+      set(tenantId, token.id, token.expiresAt, token.dirty);
     };
 
     function renewDirty() {
@@ -39,11 +39,11 @@ angular.module('tenantTokens', ['token'])
       }
     }
 
-    function renew(subject_token_id, tenantId) {
+    function renew(subjectTokenId, tenantId) {
       var data = {
         "auth": {
           "token": {
-            "id": subject_token_id
+            "id": subjectTokenId
           },
           "tenantId": tenantId
         }
@@ -71,16 +71,16 @@ angular.module('tenantTokens', ['token'])
       );
     }
 
-    function set(tenantId, tenant_token, expires_at, dirty) {
-      tenant_tokens = $cookies.getObject('Tenant-Tokens') || {};
+    function set(tenantId, tenantToken, expiresAt, dirty) {
+      tenantTokens = $cookies.getObject('Tenant-Tokens') || {};
       token = {
-        'id': tenant_token,
+        'id': tenantToken,
         'dirty': (dirty ? true : false),
-        'expires_at': expires_at,
-        'stored_at': moment().toISOString()
+        'expiresAt': expiresAt,
+        'storedAt': moment().toISOString()
       };
-      tenant_tokens[tenantId] = token;
-      $cookies.putObject('Tenant-Tokens', tenant_tokens, {expires: token.expires_at});
+      tenantTokens[tenantId] = token;
+      $cookies.putObject('Tenant-Tokens', tenantTokens, {expires: token.expiresAt});
       console.log(
         "tenantTokenService:set - Added tenantId " + tenantId +
         "\n|Tenant-Tokens| = " +
