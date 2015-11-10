@@ -10,8 +10,6 @@ angular.module('session')
   function request(config) {
     var sessionService = $injector.get('sessionService');
 
-    console.log('Intercepted:\n' + JSON.stringify(config, null, '  '));
-
     return withTokenForUrl(config.url)
       .then(function(token) {
         if (token) config.headers['X-Auth-Token'] = token.id;

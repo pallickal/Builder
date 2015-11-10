@@ -8,14 +8,11 @@ angular.module('tokensPolling', ['token', 'tenantTokens'])
     var intervalPromise;
 
     function start() {
-      console.log('tokensPollingService:start');
       stop();
       intervalPromise = $interval(refreshDirtyToken, 30000, false);
-      console.log('tokensPollingService:start - new interval set');
     };
 
     function stop() {
-      console.log('tokensPollingService:stop');
       $interval.cancel(intervalPromise);
     };
 
