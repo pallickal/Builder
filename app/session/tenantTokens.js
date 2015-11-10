@@ -30,6 +30,7 @@ angular.module('tenantTokens', ['token'])
         if (tokens[tenantId].dirty) {
           renew(tokenService.get().id, tenantId)
             .catch(function(error) {
+              console.log(error);
               console.log(error.stack);
             });
         }
