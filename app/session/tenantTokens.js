@@ -10,15 +10,15 @@ angular.module('tenantTokens', ['token'])
 
     function get(tenantId) {
       var tenantTokens = $cookies.getObject('Tenant-Tokens');
-      var requestedToken;
+      var tenantToken;
 
-      if (tenantTokens) requestedToken = tenantTokens[tenantId];
+      if (tenantTokens) tenantToken = tenantTokens[tenantId];
       console.log(
         'tenantTokensService:get - |Tenant-Tokens|["' + tenantId + '"] = ' +
-        JSON.stringify(requestedToken, null, '  ')
+        JSON.stringify(tenantToken, null, '  ')
       );
 
-      return requestedToken;
+      return tenantToken;
     }
 
     function setDirty(tenantId) {
