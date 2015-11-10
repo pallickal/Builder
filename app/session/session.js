@@ -1,4 +1,4 @@
-angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
+angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui.router.util'])
   .service('sessionService', function($q, userService, tokenService, tenantTokensService) {
     return {
       withToken: withToken,
@@ -36,11 +36,9 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
           return $q.reject('sessionService:withToken - Warning! Token expired and still held as cookie');
         } else if (sec_since_stored < 7) {
           console.log('sessionService:withToken - Skipping refresh. < 7 seconds elapsed.');
-          tokenService.injectIntoHttpCommonHeaders();
           return $q.resolve(token);
         } else if (min_till_exp > 2) {
           console.log('sessionService:withToken - Delaying refresh. > 2 minutes till expiration.');
-          tokenService.injectIntoHttpCommonHeaders();
           tokenService.setDirty();
           return $q.resolve(token);
         } else {
@@ -58,10 +56,6 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
         .then(function(subject_token) {
           var token = tenantTokensService.get(tenant_id);
 
-          function renew() {
-            return tenantTokensService.renew(subject_token.id, tenant_id);
-          }
-
           if (token) {
             var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
             var sec_since_stored = moment().diff(moment(token.stored_at), 'seconds');
@@ -77,11 +71,9 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
 
             if (min_till_exp > 0 && sec_since_stored < 7) {
               console.log('sessionService:withTenantToken - Skipping refresh. < 7 seconds elapsed.');
-              tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
               return $q.resolve(token);
             } else if (min_till_exp > 2) {
               console.log('sessionService:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
-              tenantTokensService.injectIntoHttpCommonHeaders(tenant_id);
               tenantTokensService.setDirty(tenant_id);
               return $q.resolve(token);
             } else {
@@ -90,13 +82,13 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling'])
               } else {
                 console.log('sessionService:withTenantToken - < 2 minutes till expiration, refresh first.');
               }
-              return renew();
+              return tenantTokensService.renew(subject_token.id, tenant_id);
             }
 
           } else {
             console.log('sessionService:withTenantToken - Token never existed or expired');
-            return renew();
+            return tenantTokensService.renew(subject_token.id, tenant_id);
           }
         });
-      }
+    }
   });

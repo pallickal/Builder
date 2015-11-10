@@ -25,8 +25,8 @@ angular.module('user', [])
                         }
                       };
 
-      signOut();
       console.log('tokenService:authenticate - requestData:\n' + JSON.stringify(requestData, null, '  '));
+      signOut();
 
       return $http.post('http://192.168.122.183:35357/v3/auth/tokens', requestData)
         .then(function(response) {
@@ -35,7 +35,6 @@ angular.module('user', [])
 
           tokenService.set(response.headers('X-Subject-Token'), response.data.token.expires_at);
           set(response.data.token.user);
-          tokenService.injectIntoHttpCommonHeaders();
         }, function(response) {
           return $q.reject(new Error('Error signing in'));
         });

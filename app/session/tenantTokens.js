@@ -5,7 +5,6 @@ angular.module('tenantTokens', ['token'])
       setDirty: setDirty,
       renewDirty: renewDirty,
       renew: renew,
-      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
       remove: remove
     };
 
@@ -51,23 +50,17 @@ angular.module('tenantTokens', ['token'])
       };
       console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(requestData, null, '  '));
 
-      tokenService.injectIntoHttpCommonHeaders();
       return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
             set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
-            injectIntoHttpCommonHeaders(tenant_id);
             return get(tenant_id);
           },
           function(response) {
             return $q.reject(new Error('Error getting tenant token for id ' + tenant_id));
           }
         );
-    }
-
-    function injectIntoHttpCommonHeaders(tenant_id) {
-      $http.defaults.headers.common['X-Auth-Token'] = get(tenant_id).id;
     }
 
     function remove() {

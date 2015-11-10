@@ -5,7 +5,6 @@ angular.module('token', [])
       setDirty: setDirty,
       renewDirty: renewDirty,
       renew: renew,
-      injectIntoHttpCommonHeaders: injectIntoHttpCommonHeaders,
       set: set,
       remove: remove
     };
@@ -47,7 +46,6 @@ angular.module('token', [])
         }
       };
 
-      injectIntoHttpCommonHeaders();
       return $http.post('http://192.168.122.183:35357/v2.0/tokens', requestData)
       .then(
         function(response) {
@@ -59,10 +57,6 @@ angular.module('token', [])
           return $q.reject(new Error('Error retrieving subject token'));
         }
       );
-    }
-
-    function injectIntoHttpCommonHeaders() {
-      $http.defaults.headers.common['X-Auth-Token'] = get().id;
     }
 
     function set(x_subject_token, expires_at, dirty) {

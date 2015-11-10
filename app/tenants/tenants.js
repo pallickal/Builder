@@ -5,16 +5,13 @@ angular.module('tenants', [])
     };
 
     function list() {
-      return sessionService.withToken()
-        .then(function(token) {
-          return $http.get('http://192.168.122.183:5000/v2.0/tenants')
-            .then(function(response){
-              console.log('tenantsService:list common $http headers in tenantsService: \n', $http.defaults.headers.common)
-              console.log('tenantsService:list Response:\n' + JSON.stringify(response, null, '  '));
-              return response.data;
-            }, function(response) {
-              return $q.reject(new Error('Could not get tenant list'));
-            });
+      return $http.get('http://192.168.122.183:5000/v2.0/tenants')
+        .then(function(response){
+          console.log('tenantsService:list common $http headers in tenantsService: \n', $http.defaults.headers.common)
+          console.log('tenantsService:list Response:\n' + JSON.stringify(response, null, '  '));
+          return response.data;
+        }, function(response) {
+          return $q.reject(new Error('Could not get tenant list'));
         });
     };
   })

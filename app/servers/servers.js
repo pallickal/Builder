@@ -5,16 +5,13 @@ angular.module('servers', [])
     };
 
     function list(tenant_id) {
-      return sessionService.withTenantToken(tenant_id)
-        .then(function(token) {
-          return $http.get('http://192.168.122.183:8774/v2.1/' + tenant_id + '/servers')
-            .then(function(response) {
-              console.log('serversService:list - Common $http headers: \n', $http.defaults.headers.common)
-              console.log('serversService:list - Response:\n' + JSON.stringify(response, null, '  '));
-              return response.data;
-            }, function(response) {
-              return $q.reject(new Error('Could not get server list for tenant ' + tenant_id));
-            });
+      return $http.get('http://192.168.122.183:8774/v2.1/' + tenant_id + '/servers')
+        .then(function(response) {
+          console.log('serversService:list - Common $http headers: \n', $http.defaults.headers.common)
+          console.log('serversService:list - Response:\n' + JSON.stringify(response, null, '  '));
+          return response.data;
+        }, function(response) {
+          return $q.reject(new Error('Could not get server list for tenant ' + tenant_id));
         });
     };
   })
