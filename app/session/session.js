@@ -51,10 +51,10 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
       }
     }
 
-    function withTenantToken(tenant_id) {
+    function withTenantToken(tenantId) {
       return withSubjectToken()
         .then(function(subject_token) {
-          var token = tenantTokensService.get(tenant_id);
+          var token = tenantTokensService.get(tenantId);
 
           if (token) {
             var min_till_exp = moment(token.expires_at).diff(moment(), 'minutes');
@@ -74,7 +74,7 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
               return $q.resolve(token);
             } else if (min_till_exp > 2) {
               console.log('sessionService:withTenantToken - Delayed refresh. > 2 minutes till expiration.');
-              tenantTokensService.setDirty(tenant_id);
+              tenantTokensService.setDirty(tenantId);
               return $q.resolve(token);
             } else {
               if (min_till_exp <= 0) {
@@ -82,12 +82,12 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
               } else {
                 console.log('sessionService:withTenantToken - < 2 minutes till expiration, refresh first.');
               }
-              return tenantTokensService.renew(subject_token.id, tenant_id);
+              return tenantTokensService.renew(subject_token.id, tenantId);
             }
 
           } else {
             console.log('sessionService:withTenantToken - Token never existed or expired');
-            return tenantTokensService.renew(subject_token.id, tenant_id);
+            return tenantTokensService.renew(subject_token.id, tenantId);
           }
         });
     }

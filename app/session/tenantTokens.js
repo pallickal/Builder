@@ -8,30 +8,30 @@ angular.module('tenantTokens', ['token'])
       remove: remove
     };
 
-    function get(tenant_id) {
+    function get(tenantId) {
       var tenant_tokens = $cookies.getObject('Tenant-Tokens');
-      var requested_token = (tenant_tokens ? tenant_tokens[tenant_id] : tenant_tokens);
+      var requested_token = (tenant_tokens ? tenant_tokens[tenantId] : tenant_tokens);
       console.log(
-        'tenantTokensService:get - |Tenant-Tokens|["' + tenant_id + '"] = ' +
+        'tenantTokensService:get - |Tenant-Tokens|["' + tenantId + '"] = ' +
         JSON.stringify(requested_token, null, '  ')
       );
       return requested_token;
     }
 
-    function setDirty(tenant_id) {
-      var token = get(tenant_id);
-      console.log('tenantTokensService:setDirty - setting tenant ' + tenant_id + ' token dirty');
+    function setDirty(tenantId) {
+      var token = get(tenantId);
+      console.log('tenantTokensService:setDirty - setting tenant ' + tenantId + ' token dirty');
       token.dirty = true;
-      set(tenant_id, token.id, token.expires_at, token.dirty);
+      set(tenantId, token.id, token.expires_at, token.dirty);
     };
 
     function renewDirty() {
       var tokens = $cookies.getObject('Tenant-Tokens');
 
-      for (tenant_id in tokens) {
-        if (tokens[tenant_id].dirty) {
-          console.log('tenantTokensService:renewDirty - token for tenant_id ' + tenant_id + ' is dirty');
-          renew(tokenService.get().id, tenant_id)
+      for (tenantId in tokens) {
+        if (tokens[tenantId].dirty) {
+          console.log('tenantTokensService:renewDirty - token for tenantId ' + tenantId + ' is dirty');
+          renew(tokenService.get().id, tenantId)
             .catch(function(error) {
               console.log(error.stack);
             });
@@ -39,13 +39,13 @@ angular.module('tenantTokens', ['token'])
       }
     }
 
-    function renew(subject_token_id, tenant_id) {
+    function renew(subject_token_id, tenantId) {
       var data = {
         "auth": {
           "token": {
             "id": subject_token_id
           },
-          "tenantId": tenant_id
+          "tenantId": tenantId
         }
       };
       console.log('tenantTokensService:renew - Request data\n' + JSON.stringify(data, null, '  '));
@@ -54,11 +54,11 @@ angular.module('tenantTokens', ['token'])
         .then(
           function(response) {
             console.log('tenantTokensService:renew - Response:\n' + JSON.stringify(response, null, '  '));
-            set(tenant_id, response.data.access.token.id, response.data.access.token.expires);
-            return get(tenant_id);
+            set(tenantId, response.data.access.token.id, response.data.access.token.expires);
+            return get(tenantId);
           },
           function(response) {
-            return $q.reject(new Error('Error getting tenant token for id ' + tenant_id));
+            return $q.reject(new Error('Error getting tenant token for id ' + tenantId));
           }
         );
     }
@@ -71,7 +71,7 @@ angular.module('tenantTokens', ['token'])
       );
     }
 
-    function set(tenant_id, tenant_token, expires_at, dirty) {
+    function set(tenantId, tenant_token, expires_at, dirty) {
       tenant_tokens = $cookies.getObject('Tenant-Tokens') || {};
       token = {
         'id': tenant_token,
@@ -79,10 +79,10 @@ angular.module('tenantTokens', ['token'])
         'expires_at': expires_at,
         'stored_at': moment().toISOString()
       };
-      tenant_tokens[tenant_id] = token;
+      tenant_tokens[tenantId] = token;
       $cookies.putObject('Tenant-Tokens', tenant_tokens, {expires: token.expires_at});
       console.log(
-        "tenantTokenService:set - Added tenant_id " + tenant_id +
+        "tenantTokenService:set - Added tenantId " + tenantId +
         "\n|Tenant-Tokens| = " +
         JSON.stringify($cookies.getObject('Tenant-Tokens'), null, '  ')
       );

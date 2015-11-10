@@ -10,7 +10,7 @@ angular.module('osApp', ['ngRoute', 'ngCookies', 'session', 'login', 'tenants', 
         templateUrl: 'app/tenants/tenants.html',
         controller: 'tenantsCtrl'
       }).
-      when('/:tenant_id/servers/',{
+      when('/:tenantId/servers/',{
         templateUrl: 'app/servers/servers.html',
         controller: 'serversCtrl'
       }).
