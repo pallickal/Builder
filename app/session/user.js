@@ -7,30 +7,20 @@ angular.module('user', [])
 
     function signIn(userName, password) {
       var data = {
-                        "auth": {
-                          "identity": {
-                            "methods": [
-                              "password"
-                            ],
-                            "password": {
-                              "user": {
-                                "domain": {
-                                  "name": "default"
-                                },
-                                "name": userName,
-                                "password": password
-                              }
-                            }
-                          }
-                        }
-                      };
+        "auth": {
+          "passwordCredentials": {
+            "username": userName,
+            "password": password
+          }
+        }
+      };
 
       signOut();
 
-      return $http.post('http://192.168.122.183:35357/v3/auth/tokens', data)
+      return $http.post('http://192.168.122.183:5000/v2.0/tokens', data)
         .then(function(response) {
-          tokenService.set(response.headers('X-Subject-Token'), response.data.token.expires_at);
-          set(response.data.token.user);
+          tokenService.set(response.data.access.token.id, response.data.access.token.expires);
+          set(response.data.access.user);
         }, function(response) {
           return $q.reject(new Error('Error signing in'));
         });
