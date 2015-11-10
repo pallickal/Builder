@@ -32,7 +32,7 @@ angular.module('session')
         var sessionService = $injector.get('sessionService');
         switch (route.token_type) {
           case 'subject':
-            return sessionService.withToken();
+            return sessionService.withSubjectToken();
             break;
           case 'tenant':
             return sessionService.withTenantToken(match.tenant_id);
