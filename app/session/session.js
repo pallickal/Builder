@@ -28,8 +28,6 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
     }
 
     function withTenantToken(tenantId) {
-      return withSubjectToken()
-        .then(function(subjectToken) {
           var token = tenantTokensService.get(tenantId);
 
           if (token) {
@@ -42,12 +40,11 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
               tenantTokensService.setDirty(tenantId);
               return $q.resolve(token);
             } else {
-              return tenantTokensService.renew(subjectToken.id, tenantId);
+              return tenantTokensService.renew(tenantId);
             }
 
           } else {
-            return tenantTokensService.renew(subjectToken.id, tenantId);
+            return tenantTokensService.renew(tenantId);
           }
-        });
     }
   });

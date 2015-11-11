@@ -1,5 +1,6 @@
 angular.module('tenantTokens', ['token'])
-  .service('tenantTokensService', function($interval, $http, $cookies, $q, tokenService) {
+  .service('tenantTokensService', function($interval, $http, $cookies, $q,
+    $injector, tokenService) {
     return {
       get: get,
       setDirty: setDirty,
@@ -28,7 +29,7 @@ angular.module('tenantTokens', ['token'])
 
       for (tenantId in tokens) {
         if (tokens[tenantId].dirty) {
-          renew(tokenService.get().id, tenantId)
+          renew(tenantId)
             .catch(function(error) {
               console.log(error);
               console.log(error.stack);
@@ -37,11 +38,15 @@ angular.module('tenantTokens', ['token'])
       }
     }
 
-    function renew(subjectTokenId, tenantId) {
+    function renew(tenantId) {
+      var sessionService = $injector.get('sessionService');
+
+      return sessionService.withSubjectToken()
+      .then(function(subjectToken) {
       var data = {
         "auth": {
           "token": {
-            "id": subjectTokenId
+            "id": subjectToken.id
           },
           "tenantId": tenantId
         }
@@ -57,6 +62,7 @@ angular.module('tenantTokens', ['token'])
             return $q.reject(new Error('Error getting tenant token for id ' + tenantId));
           }
         );
+      });
     }
 
     function remove() {
