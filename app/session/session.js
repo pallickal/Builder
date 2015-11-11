@@ -6,26 +6,15 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
     };
 
     function withSubjectToken() {
-      var token = subjectTokenService.get();
-      if (token) {
-        var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
-        var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
-
-        if (secSinceStored < 7) {
-          return $q.resolve(token);
-        } else if (minTillExpiration <= 2) {
-          return subjectTokenService.renew();
-        } else {
-          subjectTokenService.setDirty();
-          return $q.resolve(token);
-        }
-      } else {
-        return $q.reject(new Error('Token never existed or expired'));
-      }
+      return withToken(subjectTokenService);
     }
 
     function withTenantToken(tenantId) {
-      var token = tenantTokensService.get(tenantId);
+      return withToken(tenantTokensService, tenantId);
+    }
+
+    function withToken(tokenService, subjectId) {
+      var token = tokenService.get(subjectId);
 
       if (token) {
         var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
@@ -34,13 +23,13 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
         if (secSinceStored < 7) {
           return $q.resolve(token);
         } else if (minTillExpiration <= 2) {
-          return tenantTokensService.renew(tenantId);
+          return tokenService.renew(subjectId);
         } else {
-          tenantTokensService.setDirty(tenantId);
+          tokenService.setDirty(subjectId);
           return $q.resolve(token);
         }
       } else {
-        return tenantTokensService.renew(tenantId);
+        return tokenService.renew(subjectId);
       }
     }
   });

@@ -32,6 +32,7 @@ angular.module('token', [])
 
     function renew() {
       var token = get();
+      if (!token) return $q.reject(new Error('Token never existed or expired'));
 
       var data = {
         "auth": {
