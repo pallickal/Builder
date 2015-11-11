@@ -28,23 +28,23 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
     }
 
     function withTenantToken(tenantId) {
-          var token = tenantTokensService.get(tenantId);
+      var token = tenantTokensService.get(tenantId);
 
-          if (token) {
-            var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
-            var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
+      if (token) {
+        var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
+        var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
 
-            if (minTillExpiration > 0 && secSinceStored < 7) {
-              return $q.resolve(token);
-            } else if (minTillExpiration > 2) {
-              tenantTokensService.setDirty(tenantId);
-              return $q.resolve(token);
-            } else {
-              return tenantTokensService.renew(tenantId);
-            }
+        if (minTillExpiration > 0 && secSinceStored < 7) {
+          return $q.resolve(token);
+        } else if (minTillExpiration > 2) {
+          tenantTokensService.setDirty(tenantId);
+          return $q.resolve(token);
+        } else {
+          return tenantTokensService.renew(tenantId);
+        }
 
-          } else {
-            return tenantTokensService.renew(tenantId);
-          }
+      } else {
+        return tenantTokensService.renew(tenantId);
+      }
     }
   });

@@ -43,25 +43,25 @@ angular.module('tenantTokens', ['token'])
 
       return sessionService.withSubjectToken()
       .then(function(subjectToken) {
-      var data = {
-        "auth": {
-          "token": {
-            "id": subjectToken.id
-          },
-          "tenantId": tenantId
-        }
-      };
-
-      return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
-        .then(
-          function(response) {
-            set(tenantId, response.data.access.token.id, response.data.access.token.expires);
-            return get(tenantId);
-          },
-          function(response) {
-            return $q.reject(new Error('Error getting tenant token for id ' + tenantId));
+        var data = {
+          "auth": {
+            "token": {
+              "id": subjectToken.id
+            },
+            "tenantId": tenantId
           }
-        );
+        };
+
+        return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
+          .then(
+            function(response) {
+              set(tenantId, response.data.access.token.id, response.data.access.token.expires);
+              return get(tenantId);
+            },
+            function(response) {
+              return $q.reject(new Error('Error getting tenant token for id ' + tenantId));
+            }
+          );
       });
     }
 
