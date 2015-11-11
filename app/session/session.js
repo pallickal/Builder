@@ -11,17 +11,14 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
         var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
         var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
 
-        if (minTillExpiration <= 0) {
-          return $q.reject('sessionService:withSubjectToken - Warning! Token expired and still held as cookie');
-        } else if (secSinceStored < 7) {
+        if (secSinceStored < 7) {
           return $q.resolve(token);
-        } else if (minTillExpiration > 2) {
+        } else if (minTillExpiration <= 2) {
+          return tokenService.renew();
+        } else {
           tokenService.setDirty();
           return $q.resolve(token);
-        } else {
-          return tokenService.renew();
         }
-
       } else {
         return $q.reject(new Error('Token never existed or expired'));
       }
@@ -34,15 +31,14 @@ angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui
         var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
         var secSinceStored = moment().diff(moment(token.storedAt), 'seconds');
 
-        if (minTillExpiration > 0 && secSinceStored < 7) {
+        if (secSinceStored < 7) {
           return $q.resolve(token);
-        } else if (minTillExpiration > 2) {
+        } else if (minTillExpiration <= 2) {
+          return tenantTokensService.renew(tenantId);
+        } else {
           tenantTokensService.setDirty(tenantId);
           return $q.resolve(token);
-        } else {
-          return tenantTokensService.renew(tenantId);
         }
-
       } else {
         return tenantTokensService.renew(tenantId);
       }
