@@ -43,15 +43,15 @@ angular.module('token', [])
       };
 
       return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
-      .then(
-        function(response) {
-          set(response.data.access.token.id, response.data.access.token.expires);
-          return get();
-        },
-        function(response) {
-          return $q.reject(new Error('Error retrieving subject token'));
-        }
-      );
+        .then(
+          function(response) {
+            set(response.data.access.token.id, response.data.access.token.expires);
+            return get();
+          },
+          function(response) {
+            return $q.reject(new Error('Error retrieving subject token'));
+          }
+        );
     }
 
     function set(subjectTokenId, expiresAt, dirty) {
