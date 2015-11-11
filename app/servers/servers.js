@@ -13,12 +13,12 @@ angular.module('servers', [])
         });
     };
   })
-  .controller('serversCtrl', function($scope, $routeParams, $window, serversService){
+  .controller('serversCtrl', function($scope, $stateParams, $window, serversService){
     $scope.servers = {};
     $scope.sortField = 'name';
     $scope.reverse = false;
 
-    serversService.list($routeParams.tenantId)
+    serversService.list($stateParams.tenantId)
       .then(function(data) {
         $scope.servers = data;
       }, function(error) {

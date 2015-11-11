@@ -11,6 +11,6 @@ Search:<input ng-model="query" type="text">
     </td>
     <!-- add check for if server.links is an empty array or null -->
     <td>{{tenant.enabled}}</td>
-    <td><a href="#/{{tenant.id}}/servers">Show</a></td>
+    <td><a ui-sref="servers({ tenantId: tenant.id })">Show</a></td>
   </tr>
 </ul>

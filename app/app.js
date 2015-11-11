@@ -1,20 +1,20 @@
-angular.module('osApp', ['ngRoute', 'ngCookies', 'session', 'login', 'tenants', 'servers'])
-  .config(function($routeProvider) {
-    $routeProvider.
-      when('/login',{
+angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'tenants', 'servers'])
+  .config(function($stateProvider, $urlRouterProvider) {
+    $stateProvider.
+      state('login',{
+        url: '/login',
         templateUrl: 'app/login/login.html',
-        <!-- logged in ? redirect to /first_tenant/servers -->
         controller: 'loginCtrl'
       }).
-      when('/tenants',{
+      state('tenants',{
+        url: '/tenants',
         templateUrl: 'app/tenants/tenants.html',
         controller: 'tenantsCtrl'
       }).
-      when('/:tenantId/servers/',{
+      state('servers',{
+        url: '/:tenantId/servers',
         templateUrl: 'app/servers/servers.html',
         controller: 'serversCtrl'
-      }).
-      otherwise({
-        redirectTo: '/login'
       });
+      $urlRouterProvider.otherwise('/login');
   });
