@@ -17,8 +17,8 @@ angular.module('tokensPolling', ['token', 'tenantTokens'])
     };
 
     function refreshDirtyToken() {
-      subjectTokenService.renewDirty();
       tenantTokensService.renewDirty();
+      subjectTokenService.renewDirty();
     };
   })
   .run(function(tokensPollingService) {
