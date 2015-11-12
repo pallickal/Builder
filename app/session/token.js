@@ -24,7 +24,6 @@ angular.module('token', [])
       if (token && token.dirty) {
         renew()
           .catch(function(error) {
-            console.log(error);
             console.log(error.stack);
           });
       }

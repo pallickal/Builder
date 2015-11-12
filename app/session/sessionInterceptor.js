@@ -15,7 +15,6 @@ angular.module('session')
         if (token) config.headers['X-Auth-Token'] = token.id;
         return config;
       }, function(error) {
-        console.log(error);
         console.log(error.stack);
         return config;
       });

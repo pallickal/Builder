@@ -22,7 +22,6 @@ angular.module('tenants', [])
       .then(function(data) {
         $scope.tenants = data;
       }, function(error) {
-        console.log(error);
         console.log(error.stack);
         $window.location.href = '#/login';
       });

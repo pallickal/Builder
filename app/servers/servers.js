@@ -22,7 +22,6 @@ angular.module('servers', [])
       .then(function(data) {
         $scope.servers = data;
       }, function(error) {
-        console.log(error);
         console.log(error.stack);
         $window.location.href = '#/login';
       });

@@ -7,7 +7,6 @@ angular.module('login', ['user'])
         .then(function() {
           $window.location.href = '#/tenants';
         }, function(error) {
-          console.log(error);
           console.log(error.stack);
         });
     };

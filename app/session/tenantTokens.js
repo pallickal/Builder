@@ -31,7 +31,6 @@ angular.module('tenantTokens', ['token'])
         if (tokens[tenantId].dirty) {
           renew(tenantId)
             .catch(function(error) {
-              console.log(error);
               console.log(error.stack);
             });
         }
