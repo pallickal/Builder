@@ -9,10 +9,10 @@ angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'tenants'
           'content': { template: 'content placeholder' }
         }
       })
-      .state('app.login',{
+      .state('login',{
         url: '/login',
         views: {
-          'content@' : {
+          'content' : {
             templateUrl: 'app/login/login.html',
             controller: 'loginCtrl'
           }

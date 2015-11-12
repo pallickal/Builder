@@ -23,6 +23,6 @@ angular.module('tenants', [])
         $scope.tenants = data;
       }, function(error) {
         console.log(error.stack);
-        $state.go('app.login');
+        $state.go('login');
       });
   });

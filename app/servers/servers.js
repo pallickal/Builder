@@ -23,6 +23,6 @@ angular.module('servers', [])
         $scope.servers = data;
       }, function(error) {
         console.log(error.stack);
-        $state.go('app.login');
+        $state.go('login');
       });
   });
