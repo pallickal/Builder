@@ -1,5 +1,5 @@
 angular.module('tokensPolling', ['token', 'tenantTokens'])
-  .service('tokensPollingService', function($interval, $q, $http, subjectTokenService, tenantTokensService) {
+  .service('tokensPollingService', function($interval, $q, $http, userTokenService, tenantTokensService) {
     return {
       start: start,
       stop: stop
@@ -18,7 +18,7 @@ angular.module('tokensPolling', ['token', 'tenantTokens'])
 
     function refreshDirtyToken() {
       tenantTokensService.renewDirty();
-      subjectTokenService.renewDirty();
+      userTokenService.renewDirty();
     };
   })
   .run(function(tokensPollingService) {

@@ -1,5 +1,5 @@
 angular.module('token', [])
-  .service('subjectTokenService', function($interval, $q, $http, $cookies) {
+  .service('userTokenService', function($interval, $q, $http, $cookies) {
     return {
       get: get,
       setDirty: setDirty,
@@ -10,7 +10,7 @@ angular.module('token', [])
     };
 
     function get() {
-      return $cookies.getObject('X-Subject-Token');
+      return $cookies.getObject('User-Token');
     }
 
     function setDirty() {
@@ -48,22 +48,22 @@ angular.module('token', [])
             return get();
           },
           function(response) {
-            return $q.reject(new Error('Error retrieving subject token'));
+            return $q.reject(new Error('Error retrieving user token'));
           }
         );
     }
 
-    function set(subjectTokenId, expiresAt, dirty) {
+    function set(userTokenId, expiresAt, dirty) {
       var token = {
-        'id': subjectTokenId,
+        'id': userTokenId,
         'dirty': (dirty ? true : false),
         'expiresAt': expiresAt,
         'storedAt': moment().toISOString()
       };
-      $cookies.putObject('X-Subject-Token', token, {expires: token.expiresAt});
+      $cookies.putObject('User-Token', token, {expires: token.expiresAt});
     }
 
     function remove() {
-      $cookies.remove('X-Subject-Token');
+      $cookies.remove('User-Token');
     }
   });

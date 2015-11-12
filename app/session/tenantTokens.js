@@ -1,6 +1,6 @@
 angular.module('tenantTokens', ['token'])
   .service('tenantTokensService', function($interval, $http, $cookies, $q,
-    $injector, subjectTokenService) {
+    $injector, userTokenService) {
     return {
       get: get,
       setDirty: setDirty,
@@ -40,12 +40,12 @@ angular.module('tenantTokens', ['token'])
     function renew(tenantId) {
       var sessionService = $injector.get('sessionService');
 
-      return sessionService.withSubjectToken()
-        .then(function(subjectToken) {
+      return sessionService.withUserToken()
+        .then(function(userToken) {
           var data = {
             "auth": {
               "token": {
-                "id": subjectToken.id
+                "id": userToken.id
               },
               "tenantId": tenantId
             }
