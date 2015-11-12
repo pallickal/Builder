@@ -1,5 +1,6 @@
 angular.module('header', ['tenants'])
-  .controller('headerCtrl', function($scope, $state, tenantsService) {
+  .controller('headerCtrl', function($scope, $state, tenantsService,
+  userService) {
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
       $scope.currentTenantId = tenantId;
     });
@@ -7,6 +8,11 @@ angular.module('header', ['tenants'])
     $scope.switchTenant = function() {
       tenantsService.setCurrentTenantId($scope.currentTenantId);
     };
+
+    $scope.signOut = function() {
+      userService.signOut();
+      $state.go('login');
+    }
 
     tenantsService.list()
       .then(function(data) {
