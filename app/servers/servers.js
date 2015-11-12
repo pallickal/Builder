@@ -20,7 +20,9 @@ angular.module('servers', ['tenants'])
     $scope.reverse = false;
 
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
-      refreshServers(tenantId);
+      if (tenantId != $stateParams.tenantId) {
+        $state.go('app.servers', { tenantId: tenantId });
+      }
     });
 
     function refreshServers(tenantId) {
