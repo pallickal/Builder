@@ -1,14 +1,7 @@
-angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'tenants', 'servers'])
+angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'header',
+'sidebar', 'tenants', 'servers'])
   .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
-      .state('app', {
-        abstract: true,
-        views: {
-          'header': { templateUrl: 'app/shared/header.html' },
-          'sidebar': { templateUrl: 'app/shared/sidebar.html' },
-          'content': { template: 'content placeholder' }
-        }
-      })
       .state('login',{
         url: '/login',
         views: {
@@ -16,6 +9,19 @@ angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'tenants'
             templateUrl: 'app/login/login.html',
             controller: 'loginCtrl'
           }
+        }
+      })
+      .state('app', {
+        abstract: true,
+        views: {
+          'header': {
+            templateUrl: 'app/shared/header.html',
+            controller: 'headerCtrl'
+          },
+          'sidebar': {
+            templateUrl: 'app/shared/sidebar.html',
+            controller: 'sidebarCtrl'
+           }
         }
       })
       .state('app.tenants', {

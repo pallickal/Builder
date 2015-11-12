@@ -18,11 +18,19 @@ angular.module('servers', [])
     $scope.sortField = 'name';
     $scope.reverse = false;
 
-    serversService.list($stateParams.tenantId)
-      .then(function(data) {
-        $scope.servers = data;
-      }, function(error) {
-        console.log(error.stack);
-        $state.go('login');
-      });
+    $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
+      refreshServers(tenantId);
+    });
+
+    function refreshServers(tenantId) {
+      serversService.list(tenantId)
+        .then(function(data) {
+          $scope.servers = data;
+        }, function(error) {
+          console.log(error.stack);
+          $state.go('login');
+        });
+    }
+
+    refreshServers($stateParams.tenantId);
   });

@@ -1,1 +1,7 @@
-<h2>Header Here</h2>
+<label>Project:</label>
+<select
+    ng-change="switchTenant()"
+    ng-model="currentTenantId"
+    ng-options="tenant.id as tenant.name for tenant in tenants.tenants">
+    <option>--</option>
+</select>
