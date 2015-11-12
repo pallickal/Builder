@@ -17,7 +17,7 @@ angular.module('tenants', [])
             currTenantId = response.data.tenants[0].id;
             $rootScope.$broadcast('tenants:currentTenant:updated', currTenantId);
           }
-          return response.data;
+          return response.data.tenants;
         }, function(response) {
           return $q.reject(new Error('Could not get tenant list'));
         });

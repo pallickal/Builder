@@ -5,7 +5,7 @@ Search:<input ng-model="query" type="text">
     <td><a href"" ng-click="sortField = 'enabled'; reverse = !reverse">Enabled</a></td>
     <td>Servers</td>
   </tr>
-  <tr ng-repeat="tenant in tenants.tenants | filter:query | orderBy:sortField:reverse" id="{{tenant.id}}">
+  <tr ng-repeat="tenant in tenants | filter:query | orderBy:sortField:reverse" id="{{tenant.id}}">
     <td>
       <a href="#/tenants/{{tenant.id}}">{{tenant.name || tenant.id}}</a>
     </td>
