@@ -1,4 +1,4 @@
-angular.module('servers', [])
+angular.module('servers', ['tenants'])
   .service('serversService', function($http, $q) {
     return {
       list: list
@@ -13,7 +13,8 @@ angular.module('servers', [])
         });
     };
   })
-  .controller('serversCtrl', function($scope, $stateParams, $state, serversService){
+  .controller('serversCtrl', function($scope, $stateParams, $state,
+  tenantsService, serversService) {
     $scope.servers = {};
     $scope.sortField = 'name';
     $scope.reverse = false;
@@ -32,5 +33,8 @@ angular.module('servers', [])
         });
     }
 
+    if (tenantsService.currentTenantId() != $stateParams.tenantId) {
+      tenantsService.setCurrentTenantId($stateParams.tenantId);
+    }
     refreshServers($stateParams.tenantId);
   });
