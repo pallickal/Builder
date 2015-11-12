@@ -1,20 +1,40 @@
 angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'tenants', 'servers'])
   .config(function($stateProvider, $urlRouterProvider) {
-    $stateProvider.
-      state('login',{
+    $stateProvider
+      .state('app', {
+        abstract: true,
+        views: {
+          'header': { templateUrl: 'app/shared/header.html' },
+          'sidebar': { templateUrl: 'app/shared/sidebar.html' },
+          'content': { template: 'content placeholder' }
+        }
+      })
+      .state('app.login',{
         url: '/login',
-        templateUrl: 'app/login/login.html',
-        controller: 'loginCtrl'
-      }).
-      state('tenants',{
+        views: {
+          'content@' : {
+            templateUrl: 'app/login/login.html',
+            controller: 'loginCtrl'
+          }
+        }
+      })
+      .state('app.tenants', {
         url: '/tenants',
-        templateUrl: 'app/tenants/tenants.html',
-        controller: 'tenantsCtrl'
-      }).
-      state('servers',{
+        views: {
+          'content@' : {
+            templateUrl: 'app/tenants/tenants.html',
+            controller: 'tenantsCtrl'
+          }
+        }
+      })
+      .state('app.servers', {
         url: '/:tenantId/servers',
-        templateUrl: 'app/servers/servers.html',
-        controller: 'serversCtrl'
+        views: {
+          'content@' : {
+            templateUrl: 'app/servers/servers.html',
+            controller: 'serversCtrl'
+          }
+        }
       });
       $urlRouterProvider.otherwise('/login');
   });

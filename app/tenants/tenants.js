@@ -1,5 +1,5 @@
 angular.module('tenants', [])
-  .service('tenantsService', function($http, $q, $window, sessionService) {
+  .service('tenantsService', function($http, $q, sessionService) {
     return {
       list: list
     };
@@ -13,7 +13,7 @@ angular.module('tenants', [])
         });
     };
   })
-  .controller('tenantsCtrl', function($scope, $http, $window, tenantsService){
+  .controller('tenantsCtrl', function($scope, $http, $state, tenantsService) {
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
@@ -23,6 +23,6 @@ angular.module('tenants', [])
         $scope.tenants = data;
       }, function(error) {
         console.log(error.stack);
-        $window.location.href = '#/login';
+        $state.go('app.login');
       });
   });

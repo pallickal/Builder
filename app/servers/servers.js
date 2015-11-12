@@ -13,7 +13,7 @@ angular.module('servers', [])
         });
     };
   })
-  .controller('serversCtrl', function($scope, $stateParams, $window, serversService){
+  .controller('serversCtrl', function($scope, $stateParams, $state, serversService){
     $scope.servers = {};
     $scope.sortField = 'name';
     $scope.reverse = false;
@@ -23,6 +23,6 @@ angular.module('servers', [])
         $scope.servers = data;
       }, function(error) {
         console.log(error.stack);
-        $window.location.href = '#/login';
+        $state.go('app.login');
       });
   });
