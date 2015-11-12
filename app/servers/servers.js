@@ -1,5 +1,5 @@
 angular.module('servers', [])
-  .service('serversService', function($http, $q, sessionService) {
+  .service('serversService', function($http, $q) {
     return {
       list: list
     };

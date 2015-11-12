@@ -1,5 +1,5 @@
 angular.module('tenants', [])
-  .service('tenantsService', function($http, $q, $rootScope, sessionService) {
+  .service('tenantsService', function($http, $q, $rootScope) {
     var service = {
       list: list,
       currentTenantId: currentTenantId,
