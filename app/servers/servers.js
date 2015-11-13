@@ -1,5 +1,5 @@
 angular.module('servers', ['tenants'])
-  .service('serversService', function($http, $q) {
+  .service('Servers', function($http, $q) {
     return {
       list: list
     };
@@ -14,7 +14,7 @@ angular.module('servers', ['tenants'])
     };
   })
   .controller('serversCtrl', function($scope, $stateParams, $state,
-  tenantsService, serversService) {
+  Tenants, Servers) {
     $scope.servers = {};
     $scope.sortField = 'name';
     $scope.reverse = false;
@@ -26,7 +26,7 @@ angular.module('servers', ['tenants'])
     });
 
     function refreshServers(tenantId) {
-      serversService.list(tenantId)
+      Servers.list(tenantId)
         .then(function(data) {
           $scope.servers = data;
         }, function(error) {
@@ -35,8 +35,8 @@ angular.module('servers', ['tenants'])
         });
     }
 
-    if (tenantsService.currentTenantId() != $stateParams.tenantId) {
-      tenantsService.setCurrentTenantId($stateParams.tenantId);
+    if (Tenants.currentTenantId() != $stateParams.tenantId) {
+      Tenants.setCurrentTenantId($stateParams.tenantId);
     }
     refreshServers($stateParams.tenantId);
   });

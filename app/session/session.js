@@ -1,16 +1,16 @@
 angular.module('session', ['user', 'token', 'tenantTokens', 'tokensPolling', 'ui.router.util'])
-  .service('sessionService', function($q, userService, userTokenService, tenantTokensService) {
+  .service('sessionService', function($q, userService, UserToken, TenantTokens) {
     return {
       withUserToken: withUserToken,
       withTenantToken: withTenantToken
     };
 
     function withUserToken() {
-      return withToken(userTokenService);
+      return withToken(UserToken);
     }
 
     function withTenantToken(tenantId) {
-      return withToken(tenantTokensService, tenantId);
+      return withToken(TenantTokens, tenantId);
     }
 
     function withToken(tokenService, subjectId) {

@@ -1,5 +1,5 @@
 angular.module('tenants', [])
-  .service('tenantsService', function($http, $q, $rootScope) {
+  .service('Tenants', function($http, $q, $rootScope) {
     var service = {
       list: list,
       currentTenantId: currentTenantId,
@@ -32,12 +32,12 @@ angular.module('tenants', [])
       $rootScope.$broadcast('tenants:currentTenant:updated', currTenantId);
     }
   })
-  .controller('tenantsCtrl', function($scope, $http, $state, tenantsService) {
+  .controller('tenantsCtrl', function($scope, $http, $state, Tenants) {
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
 
-    tenantsService.list()
+    Tenants.list()
       .then(function(data) {
         $scope.tenants = data;
       }, function(error) {

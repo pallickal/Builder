@@ -1,5 +1,5 @@
 angular.module('token', [])
-  .service('userTokenService', function($interval, $q, $http, $cookies) {
+  .service('UserToken', function($interval, $q, $http, $cookies) {
     return {
       get: get,
       setDirty: setDirty,

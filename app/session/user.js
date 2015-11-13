@@ -1,5 +1,5 @@
 angular.module('user', [])
-  .service('userService', function($http, $q, $cookies, userTokenService, tenantTokensService) {
+  .service('userService', function($http, $q, $cookies, UserToken, TenantTokens) {
     return {
       signIn: signIn,
       signOut: signOut
@@ -19,7 +19,7 @@ angular.module('user', [])
 
       return $http.post('http://192.168.122.183:5000/v2.0/tokens', data)
         .then(function(response) {
-          userTokenService.set(response.data.access.token.id, response.data.access.token.expires);
+          UserToken.set(response.data.access.token.id, response.data.access.token.expires);
           set(response.data.access.user);
         }, function(response) {
           return $q.reject(new Error('Error signing in'));
@@ -27,8 +27,8 @@ angular.module('user', [])
     };
 
     function signOut() {
-      userTokenService.remove();
-      tenantTokensService.remove();
+      UserToken.remove();
+      TenantTokens.remove();
       remove();
     }
 
