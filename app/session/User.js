@@ -1,5 +1,5 @@
 angular.module('user', [])
-  .service('userService', function($http, $q, $cookies, UserToken, TenantTokens) {
+  .service('User', function($http, $q, $cookies, UserToken, TenantTokens) {
     return {
       signIn: signIn,
       signOut: signOut

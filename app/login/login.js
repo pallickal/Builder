@@ -1,9 +1,9 @@
 angular.module('login', ['user'])
-  .controller('loginCtrl', function($scope, $state, userService){
+  .controller('loginCtrl', function($scope, $state, User){
     $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
     $scope.processFunction = function() {
-      userService.signIn($scope.formData.userName, $scope.formData.password)
+      User.signIn($scope.formData.userName, $scope.formData.password)
         .then(function() {
           $state.go('app.tenants');
         }, function(error) {

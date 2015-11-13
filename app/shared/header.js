@@ -1,6 +1,6 @@
 angular.module('header', ['tenants'])
   .controller('headerCtrl', function($scope, $state, Tenants,
-  userService) {
+  User) {
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
       $scope.currentTenantId = tenantId;
     });
@@ -10,7 +10,7 @@ angular.module('header', ['tenants'])
     };
 
     $scope.signOut = function() {
-      userService.signOut();
+      User.signOut();
       $state.go('login');
     }
 

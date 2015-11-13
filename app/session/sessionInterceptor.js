@@ -8,7 +8,7 @@ angular.module('session')
   return { request: request };
 
   function request(config) {
-    var sessionService = $injector.get('sessionService');
+    var Session = $injector.get('Session');
 
     return withTokenForUrl(config.url)
       .then(function(token) {
@@ -26,13 +26,13 @@ angular.module('session')
       route.urlMatcher = route.urlMatcher || $urlMatcherFactory.compile(route.url);
       var match = route.urlMatcher.exec(url);
       if (match) {
-        var sessionService = $injector.get('sessionService');
+        var Session = $injector.get('Session');
         switch (route.tokenType) {
           case 'user':
-            return sessionService.withUserToken();
+            return Session.withUserToken();
             break;
           case 'tenant':
-            return sessionService.withTenantToken(match.tenantId);
+            return Session.withTenantToken(match.tenantId);
             break;
         }
       }
