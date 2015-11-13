@@ -1,11 +1,15 @@
 angular.module('session')
 .service('sessionInterceptor', function($injector, $q, $urlMatcherFactory) {
+  var service = {
+    request: request
+  }
+
   var routes = [
     { url: 'http://192.168.122.183:5000/v2.0/tenants', tokenType: 'user' },
     { url: 'http://192.168.122.183:8774/v2.1/:tenantId/servers', tokenType: 'tenant' }
   ];
 
-  return { request: request };
+  return service;
 
   function request(config) {
     var Session = $injector.get('Session');
