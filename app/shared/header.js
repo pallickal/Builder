@@ -16,6 +16,8 @@ angular.module('header', ['tenants'])
 
     Tenants.list()
       .then(function(data) {
+        $scope.currentTenantId = $scope.currentTenantId ||
+          Tenants.currentTenantId();
         $scope.tenants = data;
       }, function(error) {
         console.log(error.stack);
