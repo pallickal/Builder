@@ -1,6 +1,6 @@
 angular.module('servers')
-.controller('serversCtrl', function($scope, $stateParams, $state,
-Tenants, Servers) {
+.controller('serversCtrl', function($scope, $stateParams, $state, Tenants,
+  Servers) {
   $scope.servers = {};
   $scope.sortField = 'name';
   $scope.reverse = false;

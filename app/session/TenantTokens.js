@@ -1,6 +1,6 @@
 angular.module('tenantTokens', ['token'])
-  .service('TenantTokens', function($interval, $http, $cookies, $q,
-    $injector, UserToken) {
+  .service('TenantTokens', function($interval, $http, $cookies, $q, $injector,
+    UserToken) {
     return {
       get: get,
       setDirty: setDirty,
