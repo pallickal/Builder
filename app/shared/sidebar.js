@@ -3,4 +3,6 @@ angular.module('sidebar', ['tenants'])
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
       $scope.currentTenantId = tenantId;
     });
+
+    $scope.currentTenantId = Tenants.currentTenantId();
   });
