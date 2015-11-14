@@ -1,0 +1,2 @@
+/* cursor fix for non-blank href in angular specific bootstrap templates */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

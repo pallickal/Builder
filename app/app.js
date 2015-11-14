@@ -1,5 +1,5 @@
-angular.module('osApp', ['ui.router', 'ngCookies', 'session', 'login', 'header',
-  'sidebar', 'tenants', 'servers'])
+angular.module('osApp', ['ngCookies', 'ui.router', 'ui.bootstrap', 'session',
+  'login', 'header', 'sidebar', 'tenants', 'servers'])
   .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
       .state('login',{
