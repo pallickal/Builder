@@ -1,8 +1,8 @@
 Search:<input ng-model="query" type="text">
 <table>
   <tr>
-    <td><a href"" ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
-    <td><a href"" ng-click="sortField = 'status'; reverse = !reverse">Status</td>
+    <td><a href ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
+    <td><a href ng-click="sortField = 'status'; reverse = !reverse">Status</td>
   </tr>
   <tr ng-repeat="server in servers.servers | filter:query | orderBy:sortField:reverse" id="{{server.id}}">
     <td>
