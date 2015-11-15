@@ -39,7 +39,7 @@ angular.module('tenants', [])
         }, function(response) {
           return $q.reject(new Error('Could not get tenant list'));
         });
-        return requestPromise;
+      return requestPromise;
     }
 
   });
