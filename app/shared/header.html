@@ -1,8 +1,19 @@
-<label>Project:</label>
-<select
-    ng-change="switchTenant()"
-    ng-model="currentTenantId"
-    ng-options="tenant.id as tenant.name for tenant in tenants">
-    <option>--</option>
-</select>
-<a href ng-click="signOut()">Sign Out</a>
+<div class="row">
+  <div class="form-group col-md-3">
+    <label for="project">Project</label>
+    <select
+        ng-change="switchTenant()"
+        ng-model="currentTenantId"
+        ng-options="tenant.id as tenant.name for tenant in tenants"
+        class="form-control"
+        id="project">
+        <option>--</option>
+    </select>
+  </div>
+  <div class="col-md-2 col-md-offset-7 text-right">
+    <a href ng-click="signOut()">Sign Out</a>
+  </div>
+</div>
+<div class="row">
+  <hr>
+</div>
