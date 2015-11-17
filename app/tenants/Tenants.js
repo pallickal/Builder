@@ -12,7 +12,7 @@ angular.module('tenants', [])
 
     function list() {
       if (requestedAt) {
-        var secSinceRequested = moment(requestedAt).diff(moment(), 'seconds');
+        var secSinceRequested = moment().diff(requestedAt, 'seconds');
         if (secSinceRequested <= 7) return requestPromise;
       }
       return retrieveTenants();
