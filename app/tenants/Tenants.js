@@ -37,6 +37,7 @@ angular.module('tenants', [])
           }
           return response.data.tenants;
         }, function(response) {
+          requestedAt = null;
           return $q.reject(new Error('Could not get tenant list'));
         });
       return requestPromise;
