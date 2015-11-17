@@ -22,7 +22,7 @@ angular.module('servers')
       var detailPromises = [];
 
       for (var i = 0; i < servers.length; i++) {
-        var promise = Server.server(tenantId, servers[i].id)
+        var promise = Server.get(tenantId, servers[i].id)
           .then(function(data) {
             var i = indexOfServer(servers, data.id);
             if (i >= 0) servers[i]['detail'] = data;

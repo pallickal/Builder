@@ -1,8 +1,8 @@
 angular.module('servers', ['tenants'])
   .service('Server', function($http, $q) {
-    return { server: server };
+    return { get: get };
 
-    function server(tenantId, serverId) {
+    function get(tenantId, serverId) {
       return $http.get('http://192.168.122.183:8774/v2.1/' + tenantId + '/servers/' + serverId)
         .then(function(response) {
           return response.data.server;
