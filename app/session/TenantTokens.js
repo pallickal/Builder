@@ -2,14 +2,14 @@ angular.module('tenantTokens', ['token'])
   .service('TenantTokens', function($interval, $http, $cookies, $q, $injector,
     UserToken) {
     return {
-      get: get,
+      cached: cached,
       setDirty: setDirty,
       renewDirty: renewDirty,
       renew: renew,
       remove: remove
     };
 
-    function get(tenantId) {
+    function cached(tenantId) {
       var tenantTokens = $cookies.getObject('Tenant-Tokens');
       var tenantToken;
 
@@ -19,7 +19,7 @@ angular.module('tenantTokens', ['token'])
     }
 
     function setDirty(tenantId) {
-      var token = get(tenantId);
+      var token = cached(tenantId);
       token.dirty = true;
       set(tenantId, token.id, token.expiresAt, token.dirty);
     };
@@ -55,7 +55,7 @@ angular.module('tenantTokens', ['token'])
             .then(
               function(response) {
                 set(tenantId, response.data.access.token.id, response.data.access.token.expires);
-                return get(tenantId);
+                return cached(tenantId);
               },
               function(response) {
                 return $q.reject(new Error('Error getting tenant token for id ' + tenantId));

@@ -1,7 +1,7 @@
 angular.module('token', [])
   .service('UserToken', function($interval, $q, $http, $cookies) {
     return {
-      get: get,
+      cached: cached,
       setDirty: setDirty,
       renewDirty: renewDirty,
       renew: renew,
@@ -9,18 +9,18 @@ angular.module('token', [])
       remove: remove
     };
 
-    function get() {
+    function cached() {
       return $cookies.getObject('User-Token');
     }
 
     function setDirty() {
-      var token = get();
+      var token = cached();
       token.dirty = true;
       set(token.id, token.expiresAt, token.dirty);
     };
 
     function renewDirty() {
-      var token = get();
+      var token = cached();
       if (token && token.dirty) {
         renew()
           .catch(function(error) {
@@ -30,7 +30,7 @@ angular.module('token', [])
     }
 
     function renew() {
-      var token = get();
+      var token = cached();
       if (!token) return $q.reject(new Error('Token never existed or expired'));
 
       var data = {
@@ -45,7 +45,7 @@ angular.module('token', [])
         .then(
           function(response) {
             set(response.data.access.token.id, response.data.access.token.expires);
-            return get();
+            return cached();
           },
           function(response) {
             return $q.reject(new Error('Error retrieving user token'));

@@ -14,7 +14,7 @@ angular.module('session', ['token', 'tenantTokens', 'tokensPolling', 'ui.router.
     }
 
     function withToken(tokenService, tenantId) {
-      var token = tokenService.get(tenantId);
+      var token = tokenService.cached(tenantId);
 
       if (token) {
         var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
