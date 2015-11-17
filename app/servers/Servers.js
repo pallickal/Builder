@@ -1,13 +1,13 @@
 angular.module('servers')
   .service('Servers', function($http, $q, Server) {
-    return { list: list };
+    return { get: get };
 
-    function list(tenantId) {
+    function get(tenantId) {
       return $http.get('http://192.168.122.183:8774/v2.1/' + tenantId + '/servers')
         .then(function(response) {
           return stitchServerDetails(tenantId, response.data.servers);
         }, function(response) {
-          return $q.reject(new Error('Could not get server list for tenant ' + tenantId));
+          return $q.reject(new Error('Could not get servers for tenant ' + tenantId));
         });
     }
 
@@ -19,8 +19,8 @@ angular.module('servers')
         }
         return servers.indexOf(servers.find(isServerId));
       }
-      var detailPromises = [];
 
+      var detailPromises = [];
       for (var i = 0; i < servers.length; i++) {
         var promise = Server.get(tenantId, servers[i].id)
           .then(function(data) {

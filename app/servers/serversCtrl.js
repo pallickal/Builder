@@ -15,7 +15,7 @@ angular.module('servers')
     Tenants.setCurrentTenantId($stateParams.tenantId);
   }
 
-  Servers.list($stateParams.tenantId)
+  Servers.get($stateParams.tenantId)
     .then(function(servers) {
       $scope.servers = servers;
     }, function(error) {
