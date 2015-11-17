@@ -1,5 +1,5 @@
 angular.module('servers')
-.controller('serversCtrl', function($scope, $stateParams, $state, Tenants,
+.controller('serversController', function($scope, $stateParams, $state, Tenants,
   Servers) {
   $scope.servers = [];
   $scope.sortField = 'name';

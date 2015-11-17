@@ -1,5 +1,5 @@
 angular.module('login', ['user'])
-  .controller('loginCtrl', function($scope, $state, User){
+  .controller('loginController', function($scope, $state, User){
     $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
     $scope.processFunction = function() {

@@ -1,5 +1,5 @@
 angular.module('sidebar', ['tenants'])
-  .controller('sidebarCtrl', function($scope, $state, Tenants) {
+  .controller('sidebarController', function($scope, $state, Tenants) {
     $scope.currentTenantId = Tenants.currentTenantId();
     $scope.tabs = [
       {

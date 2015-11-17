@@ -1,5 +1,5 @@
 angular.module('tenants')
-  .controller('tenantsCtrl', function($scope, $http, $state, Tenants) {
+  .controller('tenantsController', function($scope, $http, $state, Tenants) {
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
