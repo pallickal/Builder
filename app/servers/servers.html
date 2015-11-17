@@ -12,7 +12,7 @@
       <td><a href ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
       <td><a href ng-click="sortField = 'status'; reverse = !reverse">Status</td>
     </tr>
-    <tr ng-repeat="server in servers.servers | filter:query | orderBy:sortField:reverse" id="{{server.id}}">
+    <tr ng-repeat="server in servers | filter:query | orderBy:sortField:reverse" id="{{server.id}}">
       <td>
         <a href="#/servers/{{server.id}}">{{server.name || server.id}}</a>
         <a href="http://192.168.122.183/dashboard/project/instances/{{server.id}}/?tab=instance_details__console">Horizon</a>
