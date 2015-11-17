@@ -13,8 +13,8 @@ angular.module('session', ['token', 'tenantTokens', 'tokensPolling', 'ui.router.
       return withToken(TenantTokens, tenantId);
     }
 
-    function withToken(tokenService, subjectId) {
-      var token = tokenService.get(subjectId);
+    function withToken(tokenService, tenantId) {
+      var token = tokenService.get(tenantId);
 
       if (token) {
         var minTillExpiration = moment(token.expiresAt).diff(moment(), 'minutes');
@@ -23,13 +23,13 @@ angular.module('session', ['token', 'tenantTokens', 'tokensPolling', 'ui.router.
         if (secSinceStored < 7) {
           return $q.resolve(token);
         } else if (minTillExpiration <= 2) {
-          return tokenService.renew(subjectId);
+          return tokenService.renew(tenantId);
         } else {
-          tokenService.setDirty(subjectId);
+          tokenService.setDirty(tenantId);
           return $q.resolve(token);
         }
       } else {
-        return tokenService.renew(subjectId);
+        return tokenService.renew(tenantId);
       }
     }
   });
