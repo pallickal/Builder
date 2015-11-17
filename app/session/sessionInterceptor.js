@@ -34,10 +34,10 @@ angular.module('session')
         var Session = $injector.get('Session');
         switch (route.tokenType) {
           case 'user':
-            return Session.withUserToken();
+            return Session.userToken();
             break;
           case 'tenant':
-            return Session.withTenantToken(match.tenantId);
+            return Session.tenantToken(match.tenantId);
             break;
         }
       }

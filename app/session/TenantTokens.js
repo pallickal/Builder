@@ -40,7 +40,7 @@ angular.module('tenantTokens', ['token'])
     function renew(tenantId) {
       var Session = $injector.get('Session');
 
-      return Session.withUserToken()
+      return Session.userToken()
         .then(function(userToken) {
           var data = {
             "auth": {
