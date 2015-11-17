@@ -18,7 +18,10 @@ angular.module('osApp', ['ngCookies', 'ui.router', 'ui.bootstrap', 'session',
             templateUrl: 'app/shared/header.html',
             controller: 'headerCtrl'
           },
-          'sidebar': {
+          'content': {
+            templateUrl: 'app/shared/sidebarLayout.html',
+          },
+          'sidebar@app': {
             templateUrl: 'app/shared/sidebar.html',
             controller: 'sidebarCtrl'
            }
@@ -27,7 +30,7 @@ angular.module('osApp', ['ngCookies', 'ui.router', 'ui.bootstrap', 'session',
       .state('app.tenants', {
         url: '/tenants',
         views: {
-          'content@' : {
+          'sideBarTarget' : {
             templateUrl: 'app/tenants/tenants.html',
             controller: 'tenantsCtrl'
           }
@@ -36,7 +39,7 @@ angular.module('osApp', ['ngCookies', 'ui.router', 'ui.bootstrap', 'session',
       .state('app.servers', {
         url: '/:tenantId/servers',
         views: {
-          'content@' : {
+          'sideBarTarget' : {
             templateUrl: 'app/servers/servers.html',
             controller: 'serversCtrl'
           }
