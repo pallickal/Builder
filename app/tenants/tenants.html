@@ -1,16 +1,25 @@
-Search:<input ng-model="query" type="text">
-<table>
-  <tr>
-    <td><a href"" ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
-    <td><a href"" ng-click="sortField = 'enabled'; reverse = !reverse">Enabled</a></td>
-    <td>Servers</td>
-  </tr>
-  <tr ng-repeat="tenant in tenants | filter:query | orderBy:sortField:reverse" id="{{tenant.id}}">
-    <td>
-      <a href="#/tenants/{{tenant.id}}">{{tenant.name || tenant.id}}</a>
-    </td>
-    <!-- add check for if server.links is an empty array or null -->
-    <td>{{tenant.enabled}}</td>
-    <td><a ui-sref="app.servers({ tenantId: tenant.id })">Show</a></td>
-  </tr>
-</ul>
+<div class="row">
+  <div class="col-md-3 col-md-offset-9">
+    <div class="form-group has-feedback">
+      <input ng-model="query" type="text" class="form-control">
+      <span class="glyphicon glyphicon-search form-control-feedback"></span>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <table class="table table-striped table-hover">
+    <tr>
+      <td><a href"" ng-click="sortField = 'name'; reverse = !reverse">Name or Id</a></td>
+      <td><a href"" ng-click="sortField = 'enabled'; reverse = !reverse">Enabled</a></td>
+      <td>Servers</td>
+    </tr>
+    <tr ng-repeat="tenant in tenants | filter:query | orderBy:sortField:reverse" id="{{tenant.id}}">
+      <td>
+        <a href="#/tenants/{{tenant.id}}">{{tenant.name || tenant.id}}</a>
+      </td>
+      <!-- add check for if server.links is an empty array or null -->
+      <td>{{tenant.enabled}}</td>
+      <td><a ui-sref="app.servers({ tenantId: tenant.id })">Show</a></td>
+    </tr>
+  </ul>
+</div>
