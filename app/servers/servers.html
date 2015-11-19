@@ -22,3 +22,40 @@
     </tr>
   </table>
 </div>
+<div class="row">
+  <div class="col-md-12" style="border: 1px solid black">
+    <h3>New Server</h3>
+    <form ng-submit="createServer()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input ng-model="newServer.name" type="text" class="form-control" id="name">
+      </div>
+      <div class="form-group">
+        <label for="flavor">Flavor</label>
+        <select
+            ng-model="newServer.flavorId"
+            class="form-control"
+            id="flavor">
+            <option ng-repeat="flavor in flavors" value="{{flavor.id}}">
+              {{flavor.name}} - {{flavor.ram}} MB RAM - {{flavor.vcpus}} VCPUS -
+              {{flavor.disk !== 0 ? flavor.disk + " GB Disk" : "Image Size"}}
+            </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="image">Image</label>
+        <select
+            ng-model="newServer.imageId"
+            class="form-control"
+            id="image">
+            <option ng-repeat="image in images" value="{{image.id}}">
+              {{image.name}} - {{image.size | bytes}}
+            </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
