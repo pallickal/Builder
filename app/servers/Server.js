@@ -1,4 +1,4 @@
-angular.module('servers', ['tenants'])
+angular.module('servers')
   .service('Server', function($http, $q) {
     return { get: get };
 
@@ -10,5 +10,4 @@ angular.module('servers', ['tenants'])
           return $q.reject(new Error('Could not get server list for tenant ' + tenantId));
         });
     }
-
   });
