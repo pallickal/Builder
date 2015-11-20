@@ -45,6 +45,14 @@ angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
       });
       $urlRouterProvider.otherwise('/sign-in');
   })
+  .run(function($state, $stateParams, $rootScope, Tenants) {
+    $rootScope.$on('$stateChangeSuccess', function() {
+      if ( $stateParams.tenantId &&
+          ($stateParams.tenantId != Tenants.currentTenantId()) ) {
+        Tenants.setCurrentTenantId($stateParams.tenantId);
+      }
+    });
+  })
   .filter('bytes', function() {
     return function(bytes, precision) {
       if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '-';

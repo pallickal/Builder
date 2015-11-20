@@ -35,10 +35,6 @@ angular.module('builderApp.servers', [])
     }
   });
 
-  if (Tenants.currentTenantId() != $stateParams.tenantId) {
-    Tenants.setCurrentTenantId($stateParams.tenantId);
-  }
-
   refreshServers();
   Flavors.get($stateParams.tenantId)
     .then(function(flavors) {
