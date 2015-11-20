@@ -31,7 +31,7 @@ angular.module('osApp.user', [])
       UserToken.remove();
       TenantTokens.remove();
       remove();
-      $state.go('login');
+      $state.go('signIn');
     }
 
     function set(data) {

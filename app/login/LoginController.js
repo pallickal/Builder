@@ -1,5 +1,5 @@
-angular.module('builderApp.login', [])
-  .controller('LoginController', function($scope, $state, User){
+angular.module('builderApp.signIn', [])
+  .controller('SignInController', function($scope, $state, User){
     $scope.formData = { 'userName' : 'demo', 'password' : 'opstack' };
 
     $scope.processFunction = function() {

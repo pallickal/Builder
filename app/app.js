@@ -1,14 +1,14 @@
 angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
-  'builderApp.login', 'builderApp.header', 'builderApp.sidebar',
+  'builderApp.signIn', 'builderApp.header', 'builderApp.sidebar',
   'builderApp.tenants', 'builderApp.servers'])
   .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
-      .state('login',{
-        url: '/login',
+      .state('signIn',{
+        url: '/sign-in',
         views: {
           'content' : {
             templateUrl: 'app/login/login.html',
-            controller: 'LoginController'
+            controller: 'SignInController'
           }
         }
       })
@@ -43,7 +43,7 @@ angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
           }
         }
       });
-      $urlRouterProvider.otherwise('/login');
+      $urlRouterProvider.otherwise('/sign-in');
   })
   .filter('bytes', function() {
     return function(bytes, precision) {
