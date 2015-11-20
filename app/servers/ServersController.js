@@ -15,6 +15,10 @@ angular.module('builderApp.servers', [])
       });
   }
 
+  $scope.onlyBootableImages = function(image) {
+    return (image.disk_format != 'ari' && image.disk_format !='aki');
+  }
+
   function refreshServers() {
     Servers.get($stateParams.tenantId)
       .then(function(servers) {

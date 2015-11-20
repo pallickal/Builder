@@ -48,7 +48,7 @@
             ng-model="newServer.imageId"
             class="form-control"
             id="image">
-            <option ng-repeat="image in images" value="{{image.id}}">
+            <option ng-repeat="image in images | filter:onlyBootableImages" value="{{image.id}}">
               {{image.name}} - {{image.size | bytes}}
             </option>
         </select>
