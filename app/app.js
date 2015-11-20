@@ -15,14 +15,14 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
         abstract: true,
         views: {
           'header': {
-            templateUrl: 'app/shared/header.html',
+            templateUrl: 'app/layout/header.html',
             controller: 'headerController'
           },
           'content': {
-            templateUrl: 'app/shared/sidebarLayout.html',
+            templateUrl: 'app/layout/sidebarLayout.html',
           },
           'sidebar@app': {
-            templateUrl: 'app/shared/sidebar.html',
+            templateUrl: 'app/layout/sidebar.html',
             controller: 'sidebarController'
            }
         }
