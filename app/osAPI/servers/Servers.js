@@ -14,10 +14,10 @@ angular.module('osAPI.servers', [])
     function stitchServerDetails(tenantId, servers) {
 
       function indexOfServer(servers, serverId) {
-        function isServerId(element, index, array) {
+        function serverIdMatch(element, index, array) {
           if (element.id == serverId) return true;
         }
-        return servers.indexOf(servers.find(isServerId));
+        return servers.indexOf(servers.find(serverIdMatch));
       }
 
       var detailPromises = [];
