@@ -1,5 +1,5 @@
 angular.module('builderApp.tenants', [])
-  .controller('tenantsController', function($scope, $http, $state, Tenants) {
+  .controller('TenantsController', function($scope, $http, $state, Tenants) {
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;

@@ -8,7 +8,7 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
         views: {
           'content' : {
             templateUrl: 'app/login/login.html',
-            controller: 'loginController'
+            controller: 'LoginController'
           }
         }
       })
@@ -17,11 +17,11 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
         views: {
           'header': {
             templateUrl: 'app/layout/header.html',
-            controller: 'headerController'
+            controller: 'HeaderController'
           },
           'content': {
             templateUrl: 'app/layout/sidebarLayout.html',
-            controller: 'sidebarController'
+            controller: 'SidebarController'
           }
         }
       })
@@ -30,7 +30,7 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
         views: {
           'sideBarTarget' : {
             templateUrl: 'app/tenants/tenants.html',
-            controller: 'tenantsController'
+            controller: 'TenantsController'
           }
         }
       })
@@ -39,7 +39,7 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
         views: {
           'sideBarTarget' : {
             templateUrl: 'app/servers/servers.html',
-            controller: 'serversController'
+            controller: 'ServersController'
           }
         }
       });

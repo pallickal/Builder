@@ -1,5 +1,5 @@
 angular.module('builderApp.servers', [])
-.controller('serversController', function($scope, $stateParams, $state, Tenants,
+.controller('ServersController', function($scope, $stateParams, $state, Tenants,
   Servers, Server, Flavors, Images) {
   $scope.sortField = 'name';
   $scope.reverse = false;
