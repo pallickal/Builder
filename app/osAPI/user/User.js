@@ -19,8 +19,10 @@ angular.module('osApp.user', [])
 
       return $http.post('http://192.168.122.183:5000/v2.0/tokens', data)
         .then(function(response) {
-          UserToken.set(response.data.access.token.id, response.data.access.token.expires);
-          set(response.data.access.user);
+          UserToken.set(response.data.access.token.id,
+                        response.data.access.token.expires);
+          UserToken.get();
+          set(response.data);
         }, function(response) {
           return $q.reject(new Error('Error signing in'));
         });
@@ -33,7 +35,12 @@ angular.module('osApp.user', [])
     }
 
     function set(data) {
-      $cookies.putObject('User', data, {expires: moment().add(8, 'hours').toISOString()});
+      var user = angular.copy(data.access.user);
+      var expires = moment(data.access.token.expires)
+                      .add(1, 'hour').toISOString();
+
+      user.responseData = data;
+      $cookies.putObject('User', user, { expires: expires });
     }
 
     function remove() {
