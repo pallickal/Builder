@@ -15,31 +15,28 @@ angular.module('osApp.user')
   return service;
 
   function request(config) {
-    var Session = $injector.get('Session');
-
-    return withTokenForUrl(config.url)
+    return useTokenForUrl(config.url)
       .then(function(token) {
         if (token) config.headers['X-Auth-Token'] = token.id;
         return config;
       }, function(error) {
-        console.log(error.stack);
+        console.log(error);
         return config;
       });
   }
 
-  function withTokenForUrl(url) {
+  function useTokenForUrl(url) {
     for (var i = 0; i < routes.length; i++) {
       var route = routes[i];
       route.urlMatcher = route.urlMatcher || $urlMatcherFactory.compile(route.url);
       var match = route.urlMatcher.exec(url);
       if (match) {
-        var Session = $injector.get('Session');
         switch (route.tokenType) {
           case 'user':
-            return Session.userToken();
+            return $injector.get('UserToken').use();
             break;
           case 'tenant':
-            return Session.tenantToken(match.tenantId);
+            return $injector.get('TenantTokens').use(match.tenantId);
             break;
         }
       }

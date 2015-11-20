@@ -1,35 +1,28 @@
 angular.module('osApp.user')
   .service('UserToken', function($interval, $q, $http, $cookies) {
     return {
+      use: use,
       cached: cached,
-      setDirty: setDirty,
-      renewDirty: renewDirty,
-      renew: renew,
+      get: get,
       set: set,
       remove: remove
     };
+
+    function use(tenantId) {
+      var token = cached();
+
+      if (token) {
+        return $q.resolve(token);
+      } else {
+        return $q.reject(new Error('User token has expired.'));
+      }
+    }
 
     function cached() {
       return $cookies.getObject('User-Token');
     }
 
-    function setDirty() {
-      var token = cached();
-      token.dirty = true;
-      set(token.id, token.expiresAt, token.dirty);
-    };
-
-    function renewDirty() {
-      var token = cached();
-      if (token && token.dirty) {
-        renew()
-          .catch(function(error) {
-            console.log(error.stack);
-          });
-      }
-    }
-
-    function renew() {
+    function get() {
       var token = cached();
       if (!token) return $q.reject(new Error('Token never existed or expired'));
 

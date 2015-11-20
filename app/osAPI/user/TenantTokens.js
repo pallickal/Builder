@@ -2,45 +2,33 @@ angular.module('osApp.user')
   .service('TenantTokens', function($interval, $http, $cookies, $q, $injector,
     UserToken) {
     return {
+      use: use,
       cached: cached,
-      setDirty: setDirty,
-      renewDirty: renewDirty,
-      renew: renew,
+      get: get,
       remove: remove
     };
+
+    function use(tenantId) {
+      var token = cached(tenantId);
+
+      if (token) {
+        return $q.resolve(token);
+      } else {
+        return get(tenantId);
+      }
+    }
 
     function cached(tenantId) {
       var tenantTokens = $cookies.getObject('Tenant-Tokens');
       var tenantToken;
 
       if (tenantTokens) tenantToken = tenantTokens[tenantId];
-
       return tenantToken;
+
     }
 
-    function setDirty(tenantId) {
-      var token = cached(tenantId);
-      token.dirty = true;
-      set(tenantId, token.id, token.expiresAt, token.dirty);
-    };
-
-    function renewDirty() {
-      var tokens = $cookies.getObject('Tenant-Tokens');
-
-      for (tenantId in tokens) {
-        if (tokens[tenantId].dirty) {
-          renew(tenantId)
-            .catch(function(error) {
-              console.log(error.stack);
-            });
-        }
-      }
-    }
-
-    function renew(tenantId) {
-      var Session = $injector.get('Session');
-
-      return Session.userToken()
+    function get(tenantId) {
+      return UserToken.use()
         .then(function(userToken) {
           var data = {
             "auth": {
