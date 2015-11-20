@@ -1,6 +1,6 @@
 angular.module('builderApp.servers', [])
 .controller('ServersController', function($scope, $stateParams, $state, Tenants,
-  Servers, Server, Flavors, Images) {
+  User, Servers, Server, Flavors, Images) {
   $scope.sortField = 'name';
   $scope.reverse = false;
   $scope.newServer = {};
@@ -21,7 +21,7 @@ angular.module('builderApp.servers', [])
         $scope.servers = servers;
       }, function(error) {
         console.log(error.stack);
-        $state.go('login');
+        User.signOut();
       });
   }
 

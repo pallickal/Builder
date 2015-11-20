@@ -8,10 +8,7 @@ angular.module('builderApp.header', [])
       Tenants.setCurrentTenantId($scope.currentTenantId);
     };
 
-    $scope.signOut = function() {
-      User.signOut();
-      $state.go('login');
-    }
+    $scope.signOut = User.signOut;
 
     Tenants.list()
       .then(function(data) {
@@ -20,6 +17,6 @@ angular.module('builderApp.header', [])
         $scope.tenants = data;
       }, function(error) {
         console.log(error.stack);
-        $state.go('login');
+        User.signOut();
       });
   });

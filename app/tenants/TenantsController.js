@@ -1,5 +1,6 @@
 angular.module('builderApp.tenants', [])
-  .controller('TenantsController', function($scope, $http, $state, Tenants) {
+  .controller('TenantsController', function($scope, $http, $state, Tenants,
+    User) {
     $scope.tenants = [];
     $scope.sortField = 'name';
     $scope.reverse = false;
@@ -9,6 +10,6 @@ angular.module('builderApp.tenants', [])
         $scope.tenants = data;
       }, function(error) {
         console.log(error.stack);
-        $state.go('login');
+        User.signOut();
       });
   });
