@@ -1,5 +1,5 @@
 angular.module('osApp.user')
-  .service('UserToken', function($interval, $q, $http, $cookies) {
+  .service('UserToken', function($interval, $q, $http, $localStorage) {
     return {
       use: use,
       cached: cached,
@@ -19,7 +19,7 @@ angular.module('osApp.user')
     }
 
     function cached() {
-      return $cookies.getObject('User-Token');
+      return $localStorage.userToken;
     }
 
     function get() {
@@ -37,7 +37,7 @@ angular.module('osApp.user')
       return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
         .then(
           function(response) {
-            set(response.data.access.token.id, response.data.access.token.expires);
+            set(data);
             return cached();
           },
           function(response) {
@@ -46,17 +46,13 @@ angular.module('osApp.user')
         );
     }
 
-    function set(userTokenId, expiresAt, dirty) {
-      var token = {
-        'id': userTokenId,
-        'dirty': (dirty ? true : false),
-        'expiresAt': expiresAt,
-        'storedAt': moment().toISOString()
-      };
-      $cookies.putObject('User-Token', token, {expires: token.expiresAt});
+    function set(data) {
+      var token = angular.copy(data.access.token);
+      token.responseData = data;
+      $localStorage.userToken = token;
     }
 
     function remove() {
-      $cookies.remove('User-Token');
+      delete $localStorage.userToken
     }
   });

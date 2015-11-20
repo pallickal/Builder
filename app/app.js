@@ -1,5 +1,5 @@
-angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
-  'osAPI', 'builderApp.login', 'builderApp.header', 'builderApp.sidebar',
+angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
+  'builderApp.login', 'builderApp.header', 'builderApp.sidebar',
   'builderApp.tenants', 'builderApp.servers'])
   .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider

@@ -1,6 +1,6 @@
 angular.module('osApp.user')
-  .service('TenantTokens', function($interval, $http, $cookies, $q, $injector,
-    UserToken) {
+  .service('TenantTokens', function($interval, $http, $localStorage, $q,
+    $injector, UserToken) {
     return {
       use: use,
       cached: cached,
@@ -19,7 +19,7 @@ angular.module('osApp.user')
     }
 
     function cached(tenantId) {
-      var tenantTokens = $cookies.getObject('Tenant-Tokens');
+      var tenantTokens = $localStorage.tenantTokens;
       var tenantToken;
 
       if (tenantTokens) tenantToken = tenantTokens[tenantId];
@@ -42,7 +42,7 @@ angular.module('osApp.user')
           return $http.post('http://192.168.122.183:35357/v2.0/tokens', data)
             .then(
               function(response) {
-                set(tenantId, response.data.access.token.id, response.data.access.token.expires);
+                set(tenantId, response.data);
                 return cached(tenantId);
               },
               function(response) {
@@ -53,18 +53,13 @@ angular.module('osApp.user')
     }
 
     function remove() {
-      $cookies.remove('Tenant-Tokens');
+      delete $localStorage.tenantTokens;
     }
 
-    function set(tenantId, tenantToken, expiresAt, dirty) {
-      tenantTokens = $cookies.getObject('Tenant-Tokens') || {};
-      token = {
-        'id': tenantToken,
-        'dirty': (dirty ? true : false),
-        'expiresAt': expiresAt,
-        'storedAt': moment().toISOString()
-      };
-      tenantTokens[tenantId] = token;
-      $cookies.putObject('Tenant-Tokens', tenantTokens, {expires: token.expiresAt});
+    function set(tenantId, data) {
+      $localStorage.tenantTokens = $localStorage.tenantTokens || {};
+      token = angular.copy(data.access.token);
+      token.responseData = data;
+      $localStorage.tenantTokens[tenantId] = token;
     }
   });
