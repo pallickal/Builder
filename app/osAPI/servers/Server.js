@@ -1,4 +1,4 @@
-angular.module('osAPI.Servers')
+angular.module('osAPI.servers')
   .service('Server', function($http, $q) {
     return {
       get: get,

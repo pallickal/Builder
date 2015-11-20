@@ -1,4 +1,4 @@
-angular.module('osAPI.Tenants', [])
+angular.module('osAPI.tenants', [])
   .service('Tenants', function($http, $q, $rootScope) {
     var service = {
       list: list,
