@@ -39,14 +39,12 @@ angular.module('builderApp.servers', [])
   Flavors.get($stateParams.tenantId)
     .then(function(flavors) {
       $scope.flavors = flavors;
-      console.log(JSON.stringify($scope.flavors, null, '  '));
     }, function(error) {
       console.log(error);
     });
   Images.get()
     .then(function(images) {
       $scope.images = images;
-      console.log(JSON.stringify($scope.images, null, '  '));
     }, function(error) {
       console.log(error);
     });
