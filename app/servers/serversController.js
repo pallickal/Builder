@@ -1,4 +1,4 @@
-angular.module('servers')
+angular.module('servers', [])
 .controller('serversController', function($scope, $stateParams, $state, Tenants,
   Servers, Server, Flavors, Images) {
   $scope.sortField = 'name';

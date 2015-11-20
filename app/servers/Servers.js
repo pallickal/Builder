@@ -1,4 +1,4 @@
-angular.module('servers', ['tenants'])
+angular.module('osServers', [])
   .service('Servers', function($http, $q, Server) {
     return { get: get };
 

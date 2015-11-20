@@ -1,4 +1,4 @@
-angular.module('servers')
+angular.module('osServers')
   .service('Server', function($http, $q) {
     return {
       get: get,
