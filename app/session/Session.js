@@ -1,4 +1,4 @@
-angular.module('session', ['token', 'tenantTokens', 'tokensPolling', 'ui.router.util'])
+angular.module('osApp.user')
   .service('Session', function($q, UserToken, TenantTokens) {
     return {
       userToken: userToken,

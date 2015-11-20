@@ -1,4 +1,4 @@
-angular.module('tenantTokens', ['token'])
+angular.module('osApp.user')
   .service('TenantTokens', function($interval, $http, $cookies, $q, $injector,
     UserToken) {
     return {

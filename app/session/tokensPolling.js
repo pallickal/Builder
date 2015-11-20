@@ -1,4 +1,4 @@
-angular.module('tokensPolling', ['token', 'tenantTokens'])
+angular.module('osApp.user')
   .service('tokensPollingService', function($interval, $q, $http, UserToken, TenantTokens) {
     return {
       start: start,

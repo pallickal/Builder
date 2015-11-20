@@ -1,4 +1,4 @@
-angular.module('user', [])
+angular.module('osApp.user', [])
   .service('User', function($http, $q, $cookies, UserToken, TenantTokens) {
     return {
       signIn: signIn,

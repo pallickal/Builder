@@ -1,4 +1,4 @@
-angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap', 'session',
+angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
   'login', 'header', 'sidebar', 'tenants', 'servers', 'osAPI'])
   .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider

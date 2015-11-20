@@ -1,4 +1,4 @@
-angular.module('token', [])
+angular.module('osApp.user')
   .service('UserToken', function($interval, $q, $http, $cookies) {
     return {
       cached: cached,

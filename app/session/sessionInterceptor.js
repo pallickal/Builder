@@ -1,4 +1,4 @@
-angular.module('session')
+angular.module('osApp.user')
 .service('sessionInterceptor', function($injector, $q, $urlMatcherFactory) {
   var service = {
     request: request
