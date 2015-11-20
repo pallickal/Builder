@@ -1,4 +1,4 @@
-angular.module('sidebar', ['tenants'])
+angular.module('builderApp.sidebar', [])
   .controller('sidebarController', function($scope, $state, Tenants) {
     $scope.currentTenantId = Tenants.currentTenantId();
     $scope.tabs = [

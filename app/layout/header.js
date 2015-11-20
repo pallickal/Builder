@@ -1,4 +1,4 @@
-angular.module('header', ['tenants'])
+angular.module('builderApp.header', [])
   .controller('headerController', function($scope, $state, Tenants, User) {
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
       $scope.currentTenantId = tenantId;
