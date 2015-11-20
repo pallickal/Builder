@@ -1,2 +1,8 @@
-<div ui-view="sidebar" class="col-md-3"></div>
+<div class="col-md-3">
+  <ul class="nav nav-stacked nav-pills">
+    <li ng-repeat="tab in tabs" ng-class="{'active' : tab.active}">
+      <a ng-href="{{$state.href(tab.state, tab.stateParams)}}">{{tab.title}}</a>
+    </li>
+  </ul>
+</div>
 <div ui-view="sideBarTarget" class="col-md-9"></div>

@@ -20,11 +20,8 @@ angular.module('builderApp', ['ngCookies', 'ui.router', 'ui.bootstrap',
           },
           'content': {
             templateUrl: 'app/layout/sidebarLayout.html',
-          },
-          'sidebar@app': {
-            templateUrl: 'app/layout/sidebar.html',
             controller: 'sidebarController'
-           }
+          }
         }
       })
       .state('app.tenants', {
