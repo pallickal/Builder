@@ -1,4 +1,4 @@
-angular.module('tenants')
+angular.module('tenants', [])
   .controller('tenantsController', function($scope, $http, $state, Tenants) {
     $scope.tenants = [];
     $scope.sortField = 'name';

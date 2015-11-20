@@ -1,1 +1,1 @@
-angular.module('osApp', ['osFlavors', 'osImages', 'osServers']);
+angular.module('osApp', ['osTenants', 'osFlavors', 'osImages', 'osServers']);
