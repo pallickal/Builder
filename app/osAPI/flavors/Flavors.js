@@ -1,4 +1,4 @@
-angular.module('osFlavors', [])
+angular.module('osAPI.Flavors', [])
   .service('Flavors', function($http) {
     return { get: get }
 

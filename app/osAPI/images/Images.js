@@ -1,4 +1,4 @@
-angular.module('osImages', [])
+angular.module('osAPI.Images', [])
   .service('Images', function($http) {
     return { get: get }
 

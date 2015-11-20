@@ -1,1 +1,1 @@
-angular.module('osAPI', ['osTenants', 'osFlavors', 'osImages', 'osServers']);
+angular.module('osAPI', ['osAPI.Tenants', 'osAPI.Flavors', 'osAPI.Images', 'osAPI.Servers']);
