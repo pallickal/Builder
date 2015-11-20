@@ -7,7 +7,7 @@ angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
         url: '/sign-in',
         views: {
           'content' : {
-            templateUrl: 'app/login/login.html',
+            templateUrl: 'app/signIn/signIn.html',
             controller: 'SignInController'
           }
         }
