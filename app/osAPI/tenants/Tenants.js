@@ -1,40 +1,53 @@
 angular.module('osAPI.tenants', [])
-  .service('Tenants', function($http, $q, $rootScope) {
+  .service('Tenants', function($http, $q, $localStorage, $rootScope) {
     var service = {
       list: list,
       currentTenantId: currentTenantId,
-      setCurrentTenantId: setCurrentTenantId
+      setCurrentTenantId: setCurrentTenantId,
+      remove: remove
     };
 
-    var currTenantId, requestedAt, requestPromise;
+    var requestedAt, requestPromise;
 
     return service;
 
     function list() {
-      if (requestedAt) {
+      if (requestedAt && requestPromise) {
         var secSinceRequested = moment().diff(requestedAt, 'seconds');
-        if (secSinceRequested <= 7) return requestPromise;
+        if (secSinceRequested <= 7) {
+          return requestPromise
+            .then(function(tenants) {
+              if (!currentTenantId()) {
+                setCurrentTenantId(tenants[0].id);
+              }
+              return tenants;
+            });
+        }
       }
-      return retrieveTenants();
+      return uncached()
+        .then(function(tenants) {
+          if (!currentTenantId()) {
+            setCurrentTenantId(tenants[0].id);
+          } else {
+            validateTenantId(currentTenantId());
+          }
+          return tenants;
+        });
     };
 
     function currentTenantId() {
-      return currTenantId;
+      return $localStorage.currentTenantId;
     }
 
     function setCurrentTenantId(tenantId) {
-      currTenantId = tenantId;
-      $rootScope.$broadcast('tenants:currentTenant:updated', currTenantId);
+      $localStorage.currentTenantId = tenantId;
+      validateTenantId(tenantId);
     }
 
-    function retrieveTenants() {
+    function uncached() {
       requestedAt = moment();
       requestPromise = $http.get('http://192.168.122.183:5000/v2.0/tenants')
         .then(function(response) {
-          if (!currTenantId) {
-            currTenantId = response.data.tenants[0].id;
-            $rootScope.$broadcast('tenants:currentTenant:updated', currTenantId);
-          }
           return response.data.tenants;
         }, function(response) {
           requestedAt = null;
@@ -43,4 +56,30 @@ angular.module('osAPI.tenants', [])
       return requestPromise;
     }
 
+    function remove() {
+      delete $localStorage.currentTenantId;
+    }
+
+    function validateTenantId(tenantId) {
+
+      function validate(tenants) {
+        function tenantIdMatch(element, index, array) {
+          if (element.id == tenantId) return true;
+        }
+
+        if (!tenants.find(tenantIdMatch)) {
+          $rootScope.$broadcast('tenants:currentTenant:invalid', tenantId);
+        }
+      }
+
+      return list()
+        .then(function(data) {
+          validate(data);
+          $rootScope.$broadcast('tenants:currentTenant:updated',
+                                currentTenantId());
+        })
+        .catch(function(error) {
+          console.log(error.stack);
+        });
+    }
   });

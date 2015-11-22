@@ -45,10 +45,11 @@ angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
       });
       $urlRouterProvider.otherwise('/sign-in');
   })
-  .run(function($state, $stateParams, $rootScope, Tenants) {
-    $rootScope.$on('$stateChangeSuccess', function() {
-      if ( $stateParams.tenantId &&
-          ($stateParams.tenantId != Tenants.currentTenantId()) ) {
+  .run(function($stateParams, $rootScope, Tenants) {
+    $rootScope.$watch(function() {
+      return $stateParams.tenantId;
+    }, function(newTenantId, oldTenantId) {
+      if (newTenantId && (newTenantId != oldTenantId)) {
         Tenants.setCurrentTenantId($stateParams.tenantId);
       }
     });

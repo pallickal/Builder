@@ -1,6 +1,6 @@
 angular.module('osApp.user', [])
   .service('User', function($http, $q, $localStorage, $state, UserToken,
-    TenantTokens) {
+    TenantTokens, Tenants) {
     return {
       signIn: signIn,
       signOut: signOut
@@ -30,6 +30,7 @@ angular.module('osApp.user', [])
     function signOut() {
       UserToken.remove();
       TenantTokens.remove();
+      Tenants.remove();
       remove();
       $state.go('signIn');
     }
