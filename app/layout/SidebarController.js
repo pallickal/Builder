@@ -15,7 +15,12 @@ angular.module('builderApp.sidebar', [])
     var tenantIdParamStates = ['app.servers'];
     $scope.$state = $state;
 
-    function syncActiveTabToState() {
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams,
+      fromState, fromParams) {
+      if (fromState.name != toState.name) setActiveTabFromCurrentState();
+    });
+
+    function setActiveTabFromCurrentState() {
       for (var i = 0; i < $scope.tabs.length; i++) {
         $scope.tabs[i].active = (
           $state.includes($scope.tabs[i].state) ? true : false
@@ -23,20 +28,16 @@ angular.module('builderApp.sidebar', [])
       }
     }
 
-    $scope.$on('$stateChangeSuccess', function(event, toState, toParams,
-      fromState, fromParams) {
-      if (fromState.name != toState.name) syncActiveTabToState();
-    });
-
-    $scope.$watch('currentTenantId', function(currentTenantId) {
-      for (var i = 0; i < $scope.tabs.length; i++) {
-        if (tenantIdParamStates.indexOf($scope.tabs[i].state) >= 0) {
-          $scope.tabs[i].stateParams.tenantId = currentTenantId;
-        }
-      }
-    });
-
     $scope.$on('tenants:currentTenant:updated', function (event, tenantId) {
       $scope.currentTenantId = tenantId;
+      updateTabsWithCurrentTenantId();
     });
+
+    function updateTabsWithCurrentTenantId() {
+      for (var i = 0; i < $scope.tabs.length; i++) {
+        if (tenantIdParamStates.indexOf($scope.tabs[i].state) >= 0) {
+          $scope.tabs[i].stateParams.tenantId = $scope.currentTenantId;
+        }
+      }
+    }
   });
