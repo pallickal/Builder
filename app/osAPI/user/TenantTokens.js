@@ -3,6 +3,7 @@ angular.module('osApp.user')
     $injector, UserToken) {
     return {
       use: use,
+      isExpired: isExpired,
       cached: cached,
       get: get,
       remove: remove
@@ -16,6 +17,17 @@ angular.module('osApp.user')
       } else {
         return get(tenantId);
       }
+    }
+
+    function isExpired(tenantId) {
+      var token = cached(tenantId)
+      var minTillExpiration;
+
+      if (token) {
+        minTillExpiration = moment(token.expires).diff(moment(), 'seconds');
+        return (minTillExpiration <= 0);
+      }
+      return true;
     }
 
     function cached(tenantId) {

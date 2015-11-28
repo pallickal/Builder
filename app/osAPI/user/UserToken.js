@@ -2,6 +2,7 @@ angular.module('osApp.user')
   .service('UserToken', function($interval, $q, $http, $localStorage) {
     return {
       use: use,
+      isExpired: isExpired,
       cached: cached,
       get: get,
       set: set,
@@ -16,6 +17,17 @@ angular.module('osApp.user')
       } else {
         return $q.reject(new Error('User token has expired.'));
       }
+    }
+
+    function isExpired() {
+      var token = cached()
+      var minTillExpiration;
+
+      if (token) {
+        minTillExpiration = moment(token.expires).diff(moment(), 'minutes');
+        return (minTillExpiration <= 0);
+      }
+      return true;
     }
 
     function cached() {
