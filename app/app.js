@@ -45,13 +45,37 @@ angular.module('builderApp', ['ui.router', 'ngStorage', 'ui.bootstrap', 'osAPI',
       });
       $urlRouterProvider.otherwise('/sign-in');
   })
-  .run(function($stateParams, $rootScope, Tenants) {
-    $rootScope.$watch(function() {
-      return $stateParams.tenantId;
-    }, function(newTenantId, oldTenantId) {
-      if (newTenantId && (newTenantId != oldTenantId)) {
-        Tenants.setCurrentTenantId($stateParams.tenantId);
+  .run(function($stateParams, $rootScope, UserToken, CurrentTenant) {
+    $rootScope.$on('$stateChangeSuccess',
+      function() {
+        if (!UserToken.isExpired()) {
+          if (!CurrentTenant.id()) CurrentTenant.setId();
+        }
       }
+    );
+    $rootScope.$watch(
+      function() {
+        return $stateParams.tenantId;
+      },
+      function(newTenantId, oldTenantId) {
+        if (newTenantId &&
+            newTenantId != oldTenantId &&
+            newTenantId != CurrentTenant.id())
+        {
+          CurrentTenant.setId(newTenantId);
+        }
+      }
+    );
+    console.log(CurrentTenant.onErrorCallbackChain)
+    CurrentTenant.onErrorCallbackChain.add({
+      name: 'builder',
+      callback: function() {
+          console.log('builder:run - onErrorCallbackChain callback #2 - lastValidTenantId does not validate, try $stateParams.tenantId = ' + $stateParams.tenantId);
+          return CurrentTenant.setIdWithoutErrorCallbacks($stateParams.tenantId);
+        }
+    });
+    $rootScope.$on('$destroy', function() {
+      CurrentTenant.onErrorCallbackChain.remove();
     });
   })
   .filter('bytes', function() {
